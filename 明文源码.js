@@ -1,13 +1,9 @@
-// <!--GAMFC-->version base on commit 43fad05dcdae3b723c53c226f8181fc5bd47223e, time is 2023-06-22 15:20:02 UTC<!--GAMFC-END-->.
-// @ts-ignore
+// src/worker.js
 import { connect } from "cloudflare:sockets";
-
-// How to generate your own UUID:
-// [Windows] Press "Win + R", input cmd and run:  Powershell -NoExit -Command "[guid]::NewGuid()"
-let userID = "86c50e3a-5b87-49dd-bd20-03c7f2735e40";
-
+ 
+let Pswd = "trojan";
 const proxyIPs = ["\u0074\u0073\u002e\u0068\u0070\u0063\u002e\u0074\u0077"]; 
-const cn_hostnames = [''];
+let cn_hostnames = [''];
 let CDNIP = '\u0077\u0077\u0077\u002e\u0076\u0069\u0073\u0061\u002e\u0063\u006f\u006d\u002e\u0073\u0067'
 // http_ip
 let IP1 = '\u0077\u0077\u0077\u002e\u0076\u0069\u0073\u0061\u002e\u0063\u006f\u006d'
@@ -35,7 +31,6 @@ let IP22 = '[2606:4700:3030::6815:5001]'
 let IP23 = '[2606:4700:3030::6815:6001]'
 let IP24 = '[2606:4700:3030::6815:2001]'
 let IP25 = '[2606:4700:3030::6815:1001]'
-
 // https_ip
 let IP26 = '\u0075\u0073\u0061\u002e\u0076\u0069\u0073\u0061\u002e\u0063\u006f\u006d'
 let IP27 = '\u006d\u0079\u0061\u006e\u006d\u0061\u0072\u002e\u0076\u0069\u0073\u0061\u002e\u0063\u006f\u006d'
@@ -62,7 +57,6 @@ let IP47 = '[2606:4700:3030::6815:5001]'
 let IP48 = '[2606:4700:3030::6815:6001]'
 let IP49 = '[2606:4700:3030::6815:2001]'
 let IP50 = '[2606:4700:3030::6815:1001]'
-
 // http_port
 let PT1 = '80'
 let PT2 = '80'
@@ -117,24 +111,19 @@ let PT48 = '443'
 let PT49 = '443'
 let PT50 = '443'
 
+let sha224Password;
 let proxyIP = proxyIPs[Math.floor(Math.random() * proxyIPs.length)];
 let proxyPort = proxyIP.includes(':') ? proxyIP.split(':')[1] : '443';
-
-if (!isValidUUID(userID)) {
-  throw new Error("uuid is not valid");
-}
-
-export default {
+const worker_default = {
   /**
    * @param {import("@cloudflare/workers-types").Request} request
-   * @param {uuid: string, proxyip: string, cdnip: string, ip1: string, ip2: string, ip3: string, ip4: string, ip5: string, ip6: string, ip7: string, ip8: string, ip9: string, ip10: string, ip11: string, ip12: string, ip13: string, ip14: string, ip15: string, ip16: string, ip17: string, ip18: string, ip19: string, ip20: string, ip21: string, ip22: string, ip23: string, ip24: string, ip25: string, ip26: string, ip27: string, ip28: string, ip29: string, ip30: string, ip31: string, ip32: string, ip33: string, ip34: string, ip35: string, ip36: string, ip37: string, ip38: string, ip39: string, ip40: string, ip41: string, ip42: string, ip43: string, ip44: string, ip45: string, ip46: string, ip47: string, ip48: string, ip49: string, ip50: string, pt1: string, pt2: string, pt3: string, pt4: string, pt5: string, pt6: string, pt7: string, pt8: string, pt9: string, pt10: string, pt11: string, pt12: string, pt13: string, pt14: string, pt15: string, pt16: string, pt17: string, pt18: string, pt19: string, pt20: string, pt21: string, pt22: string, pt23: string, pt24: string, pt25: string, pt26: string, pt27: string, pt28: string, pt29: string, pt30: string, pt31: string, pt32: string, pt33: string, pt34: string, pt35: string, pt36: string, pt37: string, pt38: string, pt39: string, pt40: string, pt41: string, pt42: string, pt43: string, pt44: string, pt45: string, pt46: string, pt47: string, pt48: string, pt49: string, pt50: string} env
+   * @param {proxyip: string, pswd: string, cdnip: string, ip1: string, ip2: string, ip3: string, ip4: string, ip5: string, ip6: string, ip7: string, ip8: string, ip9: string, ip10: string, ip11: string, ip12: string, ip13: string, ip14: string, ip15: string, ip16: string, ip17: string, ip18: string, ip19: string, ip20: string, ip21: string, ip22: string, ip23: string, ip24: string, ip25: string, ip26: string, ip27: string, ip28: string, ip29: string, ip30: string, ip31: string, ip32: string, ip33: string, ip34: string, ip35: string, ip36: string, ip37: string, ip38: string, ip39: string, ip40: string, ip41: string, ip42: string, ip43: string, ip44: string, ip45: string, ip46: string, ip47: string, ip48: string, ip49: string, ip50: string, pt1: string, pt2: string, pt3: string, pt4: string, pt5: string, pt6: string, pt7: string, pt8: string, pt9: string, pt10: string, pt11: string, pt12: string, pt13: string, pt14: string, pt15: string, pt16: string, pt17: string, pt18: string, pt19: string, pt20: string, pt21: string, pt22: string, pt23: string, pt24: string, pt25: string, pt26: string, pt27: string, pt28: string, pt29: string, pt30: string, pt31: string, pt32: string, pt33: string, pt34: string, pt35: string, pt36: string, pt37: string, pt38: string, pt39: string, pt40: string, pt41: string, pt42: string, pt43: string, pt44: string, pt45: string, pt46: string, pt47: string, pt48: string, pt49: string, pt50: string} env
    * @param {import("@cloudflare/workers-types").ExecutionContext} ctx
    * @returns {Promise<Response>}
    */
   async fetch(request, env, ctx) {
     try {
       const { proxyip } = env;
-      userID = env.uuid || userID;
 			if (proxyip) {
 				if (proxyip.includes(']:')) {
 					let lastColonIndex = proxyip.lastIndexOf(':');
@@ -161,122 +150,124 @@ export default {
 			console.log('ProxyIP:', proxyIP);
 			console.log('ProxyPort:', proxyPort);
       CDNIP = env.cdnip || CDNIP;
-	  IP1 = env.ip1 || IP1;
-	  IP2 = env.ip2 || IP2;
-	  IP3 = env.ip3 || IP3;
-	  IP4 = env.ip4 || IP4;
-	  IP5 = env.ip5 || IP5;
-	  IP6 = env.ip6 || IP6;
-	  IP7 = env.ip7 || IP7;
-	  IP8 = env.ip8 || IP8;
-	  IP9 = env.ip9 || IP9;
-	  IP10 = env.ip10 || IP10;
-	  IP11 = env.ip11 || IP11;
-	  IP12 = env.ip12 || IP12;
-	  IP13 = env.ip13 || IP13;
-	  IP14 = env.ip14 || IP14;
-	  IP15 = env.ip15 || IP15;
-	  IP16 = env.ip16 || IP16;
-	  IP17 = env.ip17 || IP17;
-	  IP18 = env.ip18 || IP18;
-	  IP19 = env.ip19 || IP19;
-	  IP20 = env.ip20 || IP20;
-	  IP21 = env.ip21 || IP21;
-	  IP22 = env.ip22 || IP22;
-	  IP23 = env.ip23 || IP23;
-	  IP24 = env.ip24 || IP24;
-	  IP25 = env.ip25 || IP25;
-	  IP26 = env.ip26 || IP26;
-	  IP27 = env.ip27 || IP27;
-	  IP28 = env.ip28 || IP28;
-	  IP29 = env.ip29 || IP29;
-	  IP30 = env.ip30 || IP30;
-	  IP31 = env.ip31 || IP31;
-	  IP32 = env.ip32 || IP32;
-	  IP33 = env.ip33 || IP33;
-	  IP34 = env.ip34 || IP34;
-	  IP35 = env.ip35 || IP35;
-	  IP36 = env.ip36 || IP36;
-	  IP37 = env.ip37 || IP37;
-	  IP38 = env.ip38 || IP38;
-	  IP39 = env.ip39 || IP39;
-	  IP40 = env.ip40 || IP40;
-	  IP41 = env.ip41 || IP41;
-	  IP42 = env.ip42 || IP42;
-	  IP43 = env.ip43 || IP43;
-	  IP44 = env.ip44 || IP44;
-	  IP45 = env.ip45 || IP45;
-	  IP46 = env.ip46 || IP46;
-	  IP47 = env.ip47 || IP47;
-	  IP48 = env.ip48 || IP48;
-	  IP49 = env.ip49 || IP49;
-	  IP50 = env.ip50 || IP50;	  
-	  PT1 = env.pt1 || PT1;
-	  PT2 = env.pt2 || PT2;
-	  PT3 = env.pt3 || PT3;
-	  PT4 = env.pt4 || PT4;
-	  PT5 = env.pt5 || PT5;
-	  PT6 = env.pt6 || PT6;
-	  PT7 = env.pt7 || PT7;
-	  PT8 = env.pt8 || PT8;
-	  PT9 = env.pt9 || PT9;
-	  PT10 = env.pt10 || PT10;
-	  PT11 = env.pt11 || PT11;
-	  PT12 = env.pt12 || PT12;
-	  PT13 = env.pt13 || PT13;
-	  PT14 = env.pt14 || PT14;
-	  PT15 = env.pt15 || PT15;
-	  PT16 = env.pt16 || PT16;
-	  PT17 = env.pt17 || PT17;
-	  PT18 = env.pt18 || PT18;
-	  PT19 = env.pt19 || PT19;
-	  PT20 = env.pt20 || PT20;
-	  PT21 = env.pt21 || PT21;
-	  PT22 = env.pt22 || PT22;
-	  PT23 = env.pt23 || PT23;
-	  PT24 = env.pt24 || PT24;
-	  PT25 = env.pt25 || PT25;
-	  PT26 = env.pt26 || PT26;
-	  PT27 = env.pt27 || PT27;
-	  PT28 = env.pt28 || PT28;
-	  PT29 = env.pt29 || PT29;
-	  PT30 = env.pt30 || PT30;
-	  PT31 = env.pt31 || PT31;
-	  PT32 = env.pt32 || PT32;
-	  PT33 = env.pt33 || PT33;
-	  PT34 = env.pt34 || PT34;
-	  PT35 = env.pt35 || PT35;
-	  PT36 = env.pt36 || PT36;
-	  PT37 = env.pt37 || PT37;
-	  PT38 = env.pt38 || PT38;
-	  PT39 = env.pt39 || PT39;
-	  PT40 = env.pt40 || PT40;
-	  PT41 = env.pt41 || PT41;
-	  PT42 = env.pt42 || PT42;
-	  PT43 = env.pt43 || PT43;
-	  PT44 = env.pt44 || PT44;
-	  PT45 = env.pt45 || PT45;
-	  PT46 = env.pt46 || PT46;
-	  PT47 = env.pt47 || PT47;
-	  PT48 = env.pt48 || PT48;
-	  PT49 = env.pt49 || PT49;
-	  PT50 = env.pt50 || PT50;
+      Pswd = env.pswd || Pswd;
+      IP1 = env.ip1 || IP1;
+      IP2 = env.ip2 || IP2;
+      IP3 = env.ip3 || IP3;
+      IP4 = env.ip4 || IP4;
+      IP5 = env.ip5 || IP5;
+      IP6 = env.ip6 || IP6;
+      IP7 = env.ip7 || IP7;
+      IP8 = env.ip8 || IP8;
+      IP9 = env.ip9 || IP9;
+      IP10 = env.ip10 || IP10;
+      IP11 = env.ip11 || IP11;
+      IP12 = env.ip12 || IP12;
+      IP13 = env.ip13 || IP13;
+      IP14 = env.ip14 || IP14;
+      IP15 = env.ip15 || IP15;
+      IP16 = env.ip16 || IP16;
+      IP17 = env.ip17 || IP17;
+      IP18 = env.ip18 || IP18;
+      IP19 = env.ip19 || IP19;
+      IP20 = env.ip20 || IP20;
+      IP21 = env.ip21 || IP21;
+      IP22 = env.ip22 || IP22;
+      IP23 = env.ip23 || IP23;
+      IP24 = env.ip24 || IP24;
+      IP25 = env.ip25 || IP25;
+      IP26 = env.ip26 || IP26;
+      IP27 = env.ip27 || IP27;
+      IP28 = env.ip28 || IP28;
+      IP29 = env.ip29 || IP29;
+      IP30 = env.ip30 || IP30;
+      IP31 = env.ip31 || IP31;
+      IP32 = env.ip32 || IP32;
+      IP33 = env.ip33 || IP33;
+      IP34 = env.ip34 || IP34;
+      IP35 = env.ip35 || IP35;
+      IP36 = env.ip36 || IP36;
+      IP37 = env.ip37 || IP37;
+      IP38 = env.ip38 || IP38;
+      IP39 = env.ip39 || IP39;
+      IP40 = env.ip40 || IP40;
+      IP41 = env.ip41 || IP41;
+      IP42 = env.ip42 || IP42;
+      IP43 = env.ip43 || IP43;
+      IP44 = env.ip44 || IP44;
+      IP45 = env.ip45 || IP45;
+      IP46 = env.ip46 || IP46;
+      IP47 = env.ip47 || IP47;
+      IP48 = env.ip48 || IP48;
+      IP49 = env.ip49 || IP49;
+      IP50 = env.ip50 || IP50;	  
+      PT1 = env.pt1 || PT1;
+      PT2 = env.pt2 || PT2;
+      PT3 = env.pt3 || PT3;
+      PT4 = env.pt4 || PT4;
+      PT5 = env.pt5 || PT5;
+      PT6 = env.pt6 || PT6;
+      PT7 = env.pt7 || PT7;
+      PT8 = env.pt8 || PT8;
+      PT9 = env.pt9 || PT9;
+      PT10 = env.pt10 || PT10;
+      PT11 = env.pt11 || PT11;
+      PT12 = env.pt12 || PT12;
+      PT13 = env.pt13 || PT13;
+      PT14 = env.pt14 || PT14;
+      PT15 = env.pt15 || PT15;
+      PT16 = env.pt16 || PT16;
+      PT17 = env.pt17 || PT17;
+      PT18 = env.pt18 || PT18;
+      PT19 = env.pt19 || PT19;
+      PT20 = env.pt20 || PT20;
+      PT21 = env.pt21 || PT21;
+      PT22 = env.pt22 || PT22;
+      PT23 = env.pt23 || PT23;
+      PT24 = env.pt24 || PT24;
+      PT25 = env.pt25 || PT25;
+      PT26 = env.pt26 || PT26;
+      PT27 = env.pt27 || PT27;
+      PT28 = env.pt28 || PT28;
+      PT29 = env.pt29 || PT29;
+      PT30 = env.pt30 || PT30;
+      PT31 = env.pt31 || PT31;
+      PT32 = env.pt32 || PT32;
+      PT33 = env.pt33 || PT33;
+      PT34 = env.pt34 || PT34;
+      PT35 = env.pt35 || PT35;
+      PT36 = env.pt36 || PT36;
+      PT37 = env.pt37 || PT37;
+      PT38 = env.pt38 || PT38;
+      PT39 = env.pt39 || PT39;
+      PT40 = env.pt40 || PT40;
+      PT41 = env.pt41 || PT41;
+      PT42 = env.pt42 || PT42;
+      PT43 = env.pt43 || PT43;
+      PT44 = env.pt44 || PT44;
+      PT45 = env.pt45 || PT45;
+      PT46 = env.pt46 || PT46;
+      PT47 = env.pt47 || PT47;
+      PT48 = env.pt48 || PT48;
+      PT49 = env.pt49 || PT49;
+      PT50 = env.pt50 || PT50;
+      sha224Password = sha256.sha224(Pswd);
       const upgradeHeader = request.headers.get("Upgrade");
       const url = new URL(request.url);
       if (!upgradeHeader || upgradeHeader !== "websocket") {
         const url = new URL(request.url);
         switch (url.pathname) {
-          case `/${userID}`: {
-            const vlessConfig = getVLESSConfig(userID, request.headers.get("Host"));
-            return new Response(`${vlessConfig}`, {
+          case `/${Pswd}`: {
+            const trojanConfig = gettrojanConfig(Pswd, request.headers.get("Host"));
+            return new Response(`${trojanConfig}`, {
               status: 200,
               headers: {
                 "Content-Type": "text/html;charset=utf-8",
               },
             });
           }
-		  case `/${userID}/ty`: {
-			const tyConfig = gettyConfig(userID, request.headers.get('Host'));
+		  case `/${Pswd}/ty`: {
+			const tyConfig = gettyConfig(Pswd, request.headers.get('Host'));
 			return new Response(`${tyConfig}`, {
 				status: 200,
 				headers: {
@@ -284,8 +275,8 @@ export default {
 				}
 			});
 		}
-		case `/${userID}/cl`: {
-			const clConfig = getclConfig(userID, request.headers.get('Host'));
+		case `/${Pswd}/cl`: {
+			const clConfig = getclConfig(Pswd, request.headers.get('Host'));
 			return new Response(`${clConfig}`, {
 				status: 200,
 				headers: {
@@ -293,8 +284,8 @@ export default {
 				}
 			});
 		}
-		case `/${userID}/sb`: {
-			const sbConfig = getsbConfig(userID, request.headers.get('Host'));
+		case `/${Pswd}/sb`: {
+			const sbConfig = getsbConfig(Pswd, request.headers.get('Host'));
 			return new Response(`${sbConfig}`, {
 				status: 200,
 				headers: {
@@ -302,8 +293,8 @@ export default {
 				}
 			});
 		}
-		case `/${userID}/pty`: {
-			const ptyConfig = getptyConfig(userID, request.headers.get('Host'));
+		case `/${Pswd}/pty`: {
+			const ptyConfig = getptyConfig(Pswd, request.headers.get('Host'));
 			return new Response(`${ptyConfig}`, {
 				status: 200,
 				headers: {
@@ -311,8 +302,8 @@ export default {
 				}
 			});
 		}
-		case `/${userID}/pcl`: {
-			const pclConfig = getpclConfig(userID, request.headers.get('Host'));
+		case `/${Pswd}/pcl`: {
+			const pclConfig = getpclConfig(Pswd, request.headers.get('Host'));
 			return new Response(`${pclConfig}`, {
 				status: 200,
 				headers: {
@@ -320,8 +311,8 @@ export default {
 				}
 			});
 		}
-		case `/${userID}/psb`: {
-			const psbConfig = getpsbConfig(userID, request.headers.get('Host'));
+		case `/${Pswd}/psb`: {
+			const psbConfig = getpsbConfig(Pswd, request.headers.get('Host'));
 			return new Response(`${psbConfig}`, {
 				status: 200,
 				headers: {
@@ -383,7 +374,7 @@ export default {
 					}
 				}	
 			}
-        return await vlessOverWSHandler(request);
+        return await trojanOverWSHandler(request);
 		}
     } catch (err) {
       /** @type {Error} */ let e = err;
@@ -397,40 +388,26 @@ function isValidIP(ip) {
     return reg.test(ip);
 }
 
-/**
- *
- * @param {import("@cloudflare/workers-types").Request} request
- */
-async function vlessOverWSHandler(request) {
-  /** @type {import("@cloudflare/workers-types").WebSocket[]} */
-  // @ts-ignore
+async function trojanOverWSHandler(request) {
   const webSocketPair = new WebSocketPair();
   const [client, webSocket] = Object.values(webSocketPair);
-
   webSocket.accept();
-
   let address = "";
   let portWithRandomLog = "";
-  const log = (/** @type {string} */ info, /** @type {string | undefined} */ event) => {
+  const log = (info, event) => {
     console.log(`[${address}:${portWithRandomLog}] ${info}`, event || "");
   };
   const earlyDataHeader = request.headers.get("sec-websocket-protocol") || "";
-
   const readableWebSocketStream = makeReadableWebSocketStream(webSocket, earlyDataHeader, log);
-
-  /** @type {{ value: import("@cloudflare/workers-types").Socket | null}}*/
   let remoteSocketWapper = {
     value: null,
   };
   let udpStreamWrite = null;
-  let isDns = false;
-
-  // ws --> remote
   readableWebSocketStream
     .pipeTo(
       new WritableStream({
         async write(chunk, controller) {
-          if (isDns && udpStreamWrite) {
+          if (udpStreamWrite) {
             return udpStreamWrite(chunk);
           }
           if (remoteSocketWapper.value) {
@@ -439,67 +416,32 @@ async function vlessOverWSHandler(request) {
             writer.releaseLock();
             return;
           }
-
           const {
             hasError,
             message,
             portRemote = 443,
             addressRemote = "",
-            rawDataIndex,
-            vlessVersion = new Uint8Array([0, 0]),
-            isUDP,
-          } = await processVlessHeader(chunk, userID);
-          address = addressRemote;
-          portWithRandomLog = `${portRemote}--${Math.random()} ${isUDP ? "udp " : "tcp "} `;
-          if (hasError) {
-            // controller.error(message);
-            throw new Error(message); // cf seems has bug, controller.error will not end stream
-            // webSocket.close(1000, message);
-            return;
-          }
-          // if UDP but port not DNS port, close it
-          if (isUDP) {
-            if (portRemote === 53) {
-              isDns = true;
-            } else {
-              // controller.error('UDP proxy only enable for DNS which is port 53');
-              throw new Error("UDP proxy only enable for DNS which is port 53"); // cf seems has bug, controller.error will not end stream
-              return;
-            }
-          }
-          // ["version", "附加信息长度 N"]
-          const vlessResponseHeader = new Uint8Array([vlessVersion[0], 0]);
-          const rawClientData = chunk.slice(rawDataIndex);
-
-          // TODO: support udp here when cf runtime has udp support
-          if (isDns) {
-            const { write } = await handleUDPOutBound(webSocket, vlessResponseHeader, log);
-            udpStreamWrite = write;
-            udpStreamWrite(rawClientData);
-            return;
-          }
-          handleTCPOutBound(
-            remoteSocketWapper,
-            addressRemote,
-            portRemote,
             rawClientData,
-            webSocket,
-            vlessResponseHeader,
-            log
-          );
+          } = await parseTrojanHeader(chunk);
+          address = addressRemote;
+          portWithRandomLog = `${portRemote}--${Math.random()} tcp`;
+          if (hasError) {
+            throw new Error(message);
+            return;
+          }
+          handleTCPOutBound(remoteSocketWapper, addressRemote, portRemote, rawClientData, webSocket, log);
         },
         close() {
-          log(`readableWebSocketStream is close`);
+          log(`readableWebSocketStream is closed`);
         },
         abort(reason) {
-          log(`readableWebSocketStream is abort`, JSON.stringify(reason));
+          log(`readableWebSocketStream is aborted`, JSON.stringify(reason));
         },
       })
     )
     .catch((err) => {
       log("readableWebSocketStream pipeTo error", err);
     });
-
   return new Response(null, {
     status: 101,
     // @ts-ignore
@@ -507,90 +449,125 @@ async function vlessOverWSHandler(request) {
   });
 }
 
-/**
- * Checks if a given UUID is present in the API response.
- * @param {string} targetUuid The UUID to search for.
- * @returns {Promise<boolean>} A Promise that resolves to true if the UUID is present in the API response, false otherwise.
- */
-async function checkUuidInApiResponse(targetUuid) {
-  // Check if any of the environment variables are empty
-
-  try {
-    const apiResponse = await getApiResponse();
-    if (!apiResponse) {
-      return false;
-    }
-    const isUuidInResponse = apiResponse.users.some((user) => user.uuid === targetUuid);
-    return isUuidInResponse;
-  } catch (error) {
-    console.error("Error:", error);
-    return false;
+async function parseTrojanHeader(buffer) {
+  if (buffer.byteLength < 56) {
+    return {
+      hasError: true,
+      message: "invalid data",
+    };
   }
+  let crLfIndex = 56;
+  if (new Uint8Array(buffer.slice(56, 57))[0] !== 0x0d || new Uint8Array(buffer.slice(57, 58))[0] !== 0x0a) {
+    return {
+      hasError: true,
+      message: "invalid header format (missing CR LF)",
+    };
+  }
+  const password = new TextDecoder().decode(buffer.slice(0, crLfIndex));
+  if (password !== sha224Password) {
+    return {
+      hasError: true,
+      message: "invalid password",
+    };
+  }
+
+  const socks5DataBuffer = buffer.slice(crLfIndex + 2);
+  if (socks5DataBuffer.byteLength < 6) {
+    return {
+      hasError: true,
+      message: "invalid SOCKS5 request data",
+    };
+  }
+
+  const view = new DataView(socks5DataBuffer);
+  const cmd = view.getUint8(0);
+  if (cmd !== 1) {
+    return {
+      hasError: true,
+      message: "unsupported command, only TCP (CONNECT) is allowed",
+    };
+  }
+
+  const atype = view.getUint8(1);
+  // 0x01: IPv4 address
+  // 0x03: Domain name
+  // 0x04: IPv6 address
+  let addressLength = 0;
+  let addressIndex = 2;
+  let address = "";
+  switch (atype) {
+    case 1:
+      addressLength = 4;
+      address = new Uint8Array(socks5DataBuffer.slice(addressIndex, addressIndex + addressLength)).join(".");
+      break;
+    case 3:
+      addressLength = new Uint8Array(socks5DataBuffer.slice(addressIndex, addressIndex + 1))[0];
+      addressIndex += 1;
+      address = new TextDecoder().decode(socks5DataBuffer.slice(addressIndex, addressIndex + addressLength));
+      break;
+    case 4:
+      addressLength = 16;
+      const dataView = new DataView(socks5DataBuffer.slice(addressIndex, addressIndex + addressLength));
+      const ipv6 = [];
+      for (let i = 0; i < 8; i++) {
+        ipv6.push(dataView.getUint16(i * 2).toString(16));
+      }
+      address = ipv6.join(":");
+      break;
+    default:
+      return {
+        hasError: true,
+        message: `invalid addressType is ${atype}`,
+      };
+  }
+
+  if (!address) {
+    return {
+      hasError: true,
+      message: `address is empty, addressType is ${atype}`,
+    };
+  }
+
+  const portIndex = addressIndex + addressLength;
+  const portBuffer = socks5DataBuffer.slice(portIndex, portIndex + 2);
+  const portRemote = new DataView(portBuffer).getUint16(0);
+  return {
+    hasError: false,
+    addressRemote: address,
+    portRemote,
+    rawClientData: socks5DataBuffer.slice(portIndex + 4),
+  };
 }
 
-/**
- * Handles outbound TCP connections.
- *
- * @param {any} remoteSocket
- * @param {string} addressRemote The remote address to connect to.
- * @param {number} portRemote The remote port to connect to.
- * @param {Uint8Array} rawClientData The raw client data to write.
- * @param {import("@cloudflare/workers-types").WebSocket} webSocket The WebSocket to pass the remote socket to.
- * @param {Uint8Array} vlessResponseHeader The VLESS response header.
- * @param {function} log The logging function.
- * @returns {Promise<void>} The remote socket.
- */
-async function handleTCPOutBound(
-  remoteSocket,
-  addressRemote,
-  portRemote,
-  rawClientData,
-  webSocket,
-  vlessResponseHeader,
-  log
-) {
+async function handleTCPOutBound(remoteSocket, addressRemote, portRemote, rawClientData, webSocket, log) {
+  if (/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(addressRemote)) addressRemote = `${atob('d3d3Lg==')}${addressRemote}${atob('LnNzbGlwLmlv')}`;
   async function connectAndWrite(address, port) {
-    if (/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(address)) address = `${atob('d3d3Lg==')}${address}${atob('LnNzbGlwLmlv')}`;
-    /** @type {import("@cloudflare/workers-types").Socket} */
-    const tcpSocket = connect({
+    const tcpSocket2 = connect({
       hostname: address,
-      port: port,
+      port,
     });
-    remoteSocket.value = tcpSocket;
+    remoteSocket.value = tcpSocket2;
     log(`connected to ${address}:${port}`);
-    const writer = tcpSocket.writable.getWriter();
-    await writer.write(rawClientData); // first write, nomal is tls client hello
+    const writer = tcpSocket2.writable.getWriter();
+    await writer.write(rawClientData);
     writer.releaseLock();
-    return tcpSocket;
+    return tcpSocket2;
   }
-
-  // if the cf connect tcp socket have no incoming data, we retry to redirect ip
   async function retry() {
-    const tcpSocket = await connectAndWrite(proxyIP || addressRemote, proxyPort || portRemote);
-    // no matter retry success or not, close websocket
-    tcpSocket.closed
+    const tcpSocket2 = await connectAndWrite(proxyIP || addressRemote, proxyPort || portRemote);
+    tcpSocket2.closed
       .catch((error) => {
         console.log("retry tcpSocket closed error", error);
       })
       .finally(() => {
         safeCloseWebSocket(webSocket);
       });
-    remoteSocketToWS(tcpSocket, webSocket, vlessResponseHeader, null, log);
+    remoteSocketToWS(tcpSocket2, webSocket, null, log);
   }
-
   const tcpSocket = await connectAndWrite(addressRemote, portRemote);
-
-  // when remoteSocket is ready, pass to websocket
-  // remote--> ws
-  remoteSocketToWS(tcpSocket, webSocket, vlessResponseHeader, retry, log);
+  remoteSocketToWS(tcpSocket, webSocket, retry, log);
 }
 
-/**
- *
- * @param {import("@cloudflare/workers-types").WebSocket} webSocketServer
- * @param {string} earlyDataHeader for ws 0rtt
- * @param {(info: string)=> void} log for ws 0rtt
- */
 function makeReadableWebSocketStream(webSocketServer, earlyDataHeader, log) {
   let readableStreamCancel = false;
   const stream = new ReadableStream({
@@ -602,13 +579,7 @@ function makeReadableWebSocketStream(webSocketServer, earlyDataHeader, log) {
         const message = event.data;
         controller.enqueue(message);
       });
-
-      // The event means that the client closed the client -> server stream.
-      // However, the server -> client stream is still open until you call close() on the server side.
-      // The WebSocket protocol says that a separate close message must be sent in each direction to fully close the socket.
       webSocketServer.addEventListener("close", () => {
-        // client send close, need close server
-        // if stream is cancel, skip controller.close
         safeCloseWebSocket(webSocketServer);
         if (readableStreamCancel) {
           return;
@@ -616,10 +587,9 @@ function makeReadableWebSocketStream(webSocketServer, earlyDataHeader, log) {
         controller.close();
       });
       webSocketServer.addEventListener("error", (err) => {
-        log("webSocketServer has error");
+        log("webSocketServer error");
         controller.error(err);
       });
-      // for ws 0rtt
       const { earlyData, error } = base64ToArrayBuffer(earlyDataHeader);
       if (error) {
         controller.error(error);
@@ -627,155 +597,21 @@ function makeReadableWebSocketStream(webSocketServer, earlyDataHeader, log) {
         controller.enqueue(earlyData);
       }
     },
-
-    pull(controller) {
-      // if ws can stop read if stream is full, we can implement backpressure
-      // https://streams.spec.whatwg.org/#example-rs-push-backpressure
-    },
+    pull(controller) {},
     cancel(reason) {
-      // 1. pipe WritableStream has error, this cancel will called, so ws handle server close into here
-      // 2. if readableStream is cancel, all controller.close/enqueue need skip,
-      // 3. but from testing controller.error still work even if readableStream is cancel
       if (readableStreamCancel) {
         return;
       }
-      log(`ReadableStream was canceled, due to ${reason}`);
+      log(`readableStream was canceled, due to ${reason}`);
       readableStreamCancel = true;
       safeCloseWebSocket(webSocketServer);
     },
   });
-
   return stream;
 }
 
-// https://xtls.github.io/development/protocols/vless.html
-// https://github.com/zizifn/excalidraw-backup/blob/main/v2ray-protocol.excalidraw
-
-/**
- *
- * @param { ArrayBuffer} vlessBuffer
- * @param {string} userID
- * @returns
- */
-async function processVlessHeader(vlessBuffer, userID) {
-  if (vlessBuffer.byteLength < 24) {
-    return {
-      hasError: true,
-      message: "invalid data",
-    };
-  }
-  const version = new Uint8Array(vlessBuffer.slice(0, 1));
-  let isValidUser = false;
-  let isUDP = false;
-  const slicedBuffer = new Uint8Array(vlessBuffer.slice(1, 17));
-  const slicedBufferString = stringify(slicedBuffer);
-
-  const uuids = userID.includes(",") ? userID.split(",") : [userID];
-
-  const checkUuidInApi = await checkUuidInApiResponse(slicedBufferString);
-  isValidUser = uuids.some((userUuid) => checkUuidInApi || slicedBufferString === userUuid.trim());
-
-  console.log(`checkUuidInApi: ${await checkUuidInApiResponse(slicedBufferString)}, userID: ${slicedBufferString}`);
-
-  if (!isValidUser) {
-    return {
-      hasError: true,
-      message: "invalid user",
-    };
-  }
-
-  const optLength = new Uint8Array(vlessBuffer.slice(17, 18))[0];
-  //skip opt for now
-
-  const command = new Uint8Array(vlessBuffer.slice(18 + optLength, 18 + optLength + 1))[0];
-
-  // 0x01 TCP
-  // 0x02 UDP
-  // 0x03 MUX
-  if (command === 1) {
-  } else if (command === 2) {
-    isUDP = true;
-  } else {
-    return {
-      hasError: true,
-      message: `command ${command} is not support, command 01-tcp,02-udp,03-mux`,
-    };
-  }
-  const portIndex = 18 + optLength + 1;
-  const portBuffer = vlessBuffer.slice(portIndex, portIndex + 2);
-  // port is big-Endian in raw data etc 80 == 0x005d
-  const portRemote = new DataView(portBuffer).getUint16(0);
-
-  let addressIndex = portIndex + 2;
-  const addressBuffer = new Uint8Array(vlessBuffer.slice(addressIndex, addressIndex + 1));
-
-  // 1--> ipv4  addressLength =4
-  // 2--> domain name addressLength=addressBuffer[1]
-  // 3--> ipv6  addressLength =16
-  const addressType = addressBuffer[0];
-  let addressLength = 0;
-  let addressValueIndex = addressIndex + 1;
-  let addressValue = "";
-  switch (addressType) {
-    case 1:
-      addressLength = 4;
-      addressValue = new Uint8Array(vlessBuffer.slice(addressValueIndex, addressValueIndex + addressLength)).join(".");
-      break;
-    case 2:
-      addressLength = new Uint8Array(vlessBuffer.slice(addressValueIndex, addressValueIndex + 1))[0];
-      addressValueIndex += 1;
-      addressValue = new TextDecoder().decode(vlessBuffer.slice(addressValueIndex, addressValueIndex + addressLength));
-      break;
-    case 3:
-      addressLength = 16;
-      const dataView = new DataView(vlessBuffer.slice(addressValueIndex, addressValueIndex + addressLength));
-      // 2001:0db8:85a3:0000:0000:8a2e:0370:7334
-      const ipv6 = [];
-      for (let i = 0; i < 8; i++) {
-        ipv6.push(dataView.getUint16(i * 2).toString(16));
-      }
-      addressValue = ipv6.join(":");
-      // seems no need add [] for ipv6
-      break;
-    default:
-      return {
-        hasError: true,
-        message: `invild  addressType is ${addressType}`,
-      };
-  }
-  if (!addressValue) {
-    return {
-      hasError: true,
-      message: `addressValue is empty, addressType is ${addressType}`,
-    };
-  }
-
-  return {
-    hasError: false,
-    addressRemote: addressValue,
-    addressType,
-    portRemote,
-    rawDataIndex: addressValueIndex + addressLength,
-    vlessVersion: version,
-    isUDP,
-  };
-}
-
-/**
- *
- * @param {import("@cloudflare/workers-types").Socket} remoteSocket
- * @param {import("@cloudflare/workers-types").WebSocket} webSocket
- * @param {ArrayBuffer} vlessResponseHeader
- * @param {(() => Promise<void>) | null} retry
- * @param {*} log
- */
-async function remoteSocketToWS(remoteSocket, webSocket, vlessResponseHeader, retry, log) {
-  // remote--> ws
-  let remoteChunkCount = 0;
-  let chunks = [];
-  /** @type {ArrayBuffer | null} */
-  let vlessHeader = vlessResponseHeader;
-  let hasIncomingData = false; // check if remoteSocket has incoming data
+async function remoteSocketToWS(remoteSocket, webSocket, retry, log) {
+  let hasIncomingData = false;
   await remoteSocket.readable
     .pipeTo(
       new WritableStream({
@@ -787,56 +623,34 @@ async function remoteSocketToWS(remoteSocket, webSocket, vlessResponseHeader, re
          */
         async write(chunk, controller) {
           hasIncomingData = true;
-          // remoteChunkCount++;
           if (webSocket.readyState !== WS_READY_STATE_OPEN) {
-            controller.error("webSocket.readyState is not open, maybe close");
+            controller.error("webSocket connection is not open");
           }
-          if (vlessHeader) {
-            webSocket.send(await new Blob([vlessHeader, chunk]).arrayBuffer());
-            vlessHeader = null;
-          } else {
-            // seems no need rate limit this, CF seems fix this??..
-            // if (remoteChunkCount > 20000) {
-            // 	// cf one package is 4096 byte(4kb),  4096 * 20000 = 80M
-            // 	await delay(1);
-            // }
-            webSocket.send(chunk);
-          }
+          webSocket.send(chunk);
         },
         close() {
-          log(`remoteConnection!.readable is close with hasIncomingData is ${hasIncomingData}`);
-          // safeCloseWebSocket(webSocket); // no need server close websocket frist for some case will casue HTTP ERR_CONTENT_LENGTH_MISMATCH issue, client will send close event anyway.
+          log(`remoteSocket.readable is closed, hasIncomingData: ${hasIncomingData}`);
         },
         abort(reason) {
-          console.error(`remoteConnection!.readable abort`, reason);
+          console.error("remoteSocket.readable abort", reason);
         },
       })
     )
     .catch((error) => {
-      console.error(`remoteSocketToWS has exception `, error.stack || error);
+      console.error(`remoteSocketToWS error:`, error.stack || error);
       safeCloseWebSocket(webSocket);
     });
-
-  // seems is cf connect socket have error,
-  // 1. Socket.closed will have error
-  // 2. Socket.readable will be close without any data coming
   if (hasIncomingData === false && retry) {
     log(`retry`);
     retry();
   }
 }
 
-/**
- *
- * @param {string} base64Str
- * @returns
- */
 function base64ToArrayBuffer(base64Str) {
   if (!base64Str) {
     return { error: null };
   }
   try {
-    // go use modified Base64 for URL rfc4648 which js atob not support
     base64Str = base64Str.replace(/-/g, "+").replace(/_/g, "/");
     const decode = atob(base64Str);
     const arryBuffer = Uint8Array.from(decode, (c) => c.charCodeAt(0));
@@ -846,21 +660,9 @@ function base64ToArrayBuffer(base64Str) {
   }
 }
 
-/**
- * This is not real UUID validation
- * @param {string} uuid
- */
-function isValidUUID(uuid) {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(uuid);
-}
+let WS_READY_STATE_OPEN = 1;
+let WS_READY_STATE_CLOSING = 2;
 
-const WS_READY_STATE_OPEN = 1;
-const WS_READY_STATE_CLOSING = 2;
-/**
- * Normally, WebSocket will not has exceptions when close.
- * @param {import("@cloudflare/workers-types").WebSocket} socket
- */
 function safeCloseWebSocket(socket) {
   try {
     if (socket.readyState === WS_READY_STATE_OPEN || socket.readyState === WS_READY_STATE_CLOSING) {
@@ -870,137 +672,23 @@ function safeCloseWebSocket(socket) {
     console.error("safeCloseWebSocket error", error);
   }
 }
+export { worker_default as default };
 
-const byteToHex = [];
-for (let i = 0; i < 256; ++i) {
-  byteToHex.push((i + 256).toString(16).slice(1));
-}
-function unsafeStringify(arr, offset = 0) {
-  return (
-    byteToHex[arr[offset + 0]] +
-    byteToHex[arr[offset + 1]] +
-    byteToHex[arr[offset + 2]] +
-    byteToHex[arr[offset + 3]] +
-    "-" +
-    byteToHex[arr[offset + 4]] +
-    byteToHex[arr[offset + 5]] +
-    "-" +
-    byteToHex[arr[offset + 6]] +
-    byteToHex[arr[offset + 7]] +
-    "-" +
-    byteToHex[arr[offset + 8]] +
-    byteToHex[arr[offset + 9]] +
-    "-" +
-    byteToHex[arr[offset + 10]] +
-    byteToHex[arr[offset + 11]] +
-    byteToHex[arr[offset + 12]] +
-    byteToHex[arr[offset + 13]] +
-    byteToHex[arr[offset + 14]] +
-    byteToHex[arr[offset + 15]]
-  ).toLowerCase();
-}
-function stringify(arr, offset = 0) {
-  const uuid = unsafeStringify(arr, offset);
-  if (!isValidUUID(uuid)) {
-    throw TypeError("Stringified UUID is invalid");
-  }
-  return uuid;
-}
- 
-/**
- *
- * @param {import("@cloudflare/workers-types").WebSocket} webSocket
- * @param {ArrayBuffer} vlessResponseHeader
- * @param {(string)=> void} log
- */
-async function handleUDPOutBound(webSocket, vlessResponseHeader, log) {
-  let isVlessHeaderSent = false;
-  const transformStream = new TransformStream({
-    start(controller) {},
-    transform(chunk, controller) {
-      // udp message 2 byte is the the length of udp data
-      // TODO: this should have bug, beacsue maybe udp chunk can be in two websocket message
-      for (let index = 0; index < chunk.byteLength; ) {
-        const lengthBuffer = chunk.slice(index, index + 2);
-        const udpPakcetLength = new DataView(lengthBuffer).getUint16(0);
-        const udpData = new Uint8Array(chunk.slice(index + 2, index + 2 + udpPakcetLength));
-        index = index + 2 + udpPakcetLength;
-        controller.enqueue(udpData);
-      }
-    },
-    flush(controller) {},
-  });
-
-  // only handle dns udp for now
-  transformStream.readable
-    .pipeTo(
-      new WritableStream({
-        async write(chunk) {
-          const resp = await fetch(
-            dohURL, // dns server url
-            {
-              method: "POST",
-              headers: {
-                "content-type": "application/dns-message",
-              },
-              body: chunk,
-            }
-          );
-          const dnsQueryResult = await resp.arrayBuffer();
-          const udpSize = dnsQueryResult.byteLength;
-          // console.log([...new Uint8Array(dnsQueryResult)].map((x) => x.toString(16)));
-          const udpSizeBuffer = new Uint8Array([(udpSize >> 8) & 0xff, udpSize & 0xff]);
-          if (webSocket.readyState === WS_READY_STATE_OPEN) {
-            log(`doh success and dns message length is ${udpSize}`);
-            if (isVlessHeaderSent) {
-              webSocket.send(await new Blob([udpSizeBuffer, dnsQueryResult]).arrayBuffer());
-            } else {
-              webSocket.send(await new Blob([vlessResponseHeader, udpSizeBuffer, dnsQueryResult]).arrayBuffer());
-              isVlessHeaderSent = true;
-            }
-          }
-        },
-      })
-    )
-    .catch((error) => {
-      log("dns udp has error" + error);
-    });
-
-  const writer = transformStream.writable.getWriter();
-
-  return {
-    /**
-     *
-     * @param {Uint8Array} chunk
-     */
-    write(chunk) {
-      writer.write(chunk);
-    },
-  };
-}
-
-/**
- *
- * @param {string} userID
- * @param {string | null} hostName
- * @returns {string}
- */
-function getVLESSConfig(userID, hostName) {
-  const wvlessws = `vless\u003A//${userID}\u0040${CDNIP}:8880?encryption=none&security=none&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`;
-  const pvlesswstls = `vless\u003A//${userID}\u0040${CDNIP}:8443?encryption=none&security=tls&type=ws&host=${hostName}&sni=${hostName}&fp=random&path=%2F%3Fed%3D2560#${hostName}`;
+//# sourceMappingURL=worker.js.map
+function gettrojanConfig(Pswd, hostName) {
+  const wtrojanws = atob(btoa(`trojan://${Pswd}@${CDNIP}:8880?security=none&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#${hostName}`));
+  const ptrojanwstls = atob(btoa(`trojan://${Pswd}@${CDNIP}:8443?security=tls&type=ws&host=${hostName}&sni=${hostName}&fp=random&path=%2F%3Fed%3D2560#${hostName}`));
   const note = `甬哥博客地址：https://ygkkk.blogspot.com\n甬哥YouTube频道：https://www.youtube.com/@ygkkk\n甬哥TG电报群组：https://t.me/ygkkktg\n甬哥TG电报频道：https://t.me/ygkkktgpd\n\nProxyIP全局运行中：${proxyIP}`;
-  const ty = `https://${hostName}/${userID}/ty`
-  const cl = `https://${hostName}/${userID}/cl`
-  const sb = `https://${hostName}/${userID}/sb`
-  const pty = `https://${hostName}/${userID}/pty`
-  const pcl = `https://${hostName}/${userID}/pcl`
-  const psb = `https://${hostName}/${userID}/psb`
+  const ty = `https://${hostName}/${Pswd}/ty`
+  const cl = `https://${hostName}/${Pswd}/cl`
+  const sb = `https://${hostName}/${Pswd}/sb`
+  const pty = `https://${hostName}/${Pswd}/pty`
+  const pcl = `https://${hostName}/${Pswd}/pcl`
+  const psb = `https://${hostName}/${Pswd}/psb`
 
-  const wkvlessshare = btoa(`vless\u003A//${userID}\u0040${IP1}:${PT1}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V1_${IP1}_${PT1}\nvless\u003A//${userID}\u0040${IP2}:${PT2}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V2_${IP2}_${PT2}\nvless\u003A//${userID}\u0040${IP3}:${PT3}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V3_${IP3}_${PT3}\nvless\u003A//${userID}\u0040${IP4}:${PT4}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V4_${IP4}_${PT4}\nvless\u003A//${userID}\u0040${IP5}:${PT5}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V5_${IP5}_${PT5}\nvless\u003A//${userID}\u0040${IP6}:${PT6}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V6_${IP6}_${PT6}\nvless\u003A//${userID}\u0040${IP7}:${PT7}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V7_${IP7}_${PT7}\nvless\u003A//${userID}\u0040${IP8}:${PT8}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V8_${IP8}_${PT8}\nvless\u003A//${userID}\u0040${IP9}:${PT9}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V9_${IP9}_${PT9}\nvless\u003A//${userID}\u0040${IP10}:${PT10}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V10_${IP10}_${PT10}\nvless\u003A//${userID}\u0040${IP11}:${PT11}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V11_${IP11}_${PT11}\nvless\u003A//${userID}\u0040${IP12}:${PT12}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V12_${IP12}_${PT12}\nvless\u003A//${userID}\u0040${IP13}:${PT13}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V13_${IP13}_${PT13}\nvless\u003A//${userID}\u0040${IP14}:${PT14}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V14_${IP14}_${PT14}\nvless\u003A//${userID}\u0040${IP15}:${PT15}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V15_${IP15}_${PT15}\nvless\u003A//${userID}\u0040${IP16}:${PT16}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V16_${IP16}_${PT16}\nvless\u003A//${userID}\u0040${IP17}:${PT17}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V17_${IP17}_${PT17}\nvless\u003A//${userID}\u0040${IP18}:${PT18}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V18_${IP18}_${PT18}\nvless\u003A//${userID}\u0040${IP19}:${PT19}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V19_${IP19}_${PT19}\nvless\u003A//${userID}\u0040${IP20}:${PT20}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V20_${IP20}_${PT20}\nvless\u003A//${userID}\u0040${IP21}:${PT21}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V21_${IP21}_${PT21}\nvless\u003A//${userID}\u0040${IP22}:${PT22}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V22_${IP22}_${PT22}\nvless\u003A//${userID}\u0040${IP23}:${PT23}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V23_${IP23}_${PT23}\nvless\u003A//${userID}\u0040${IP24}:${PT24}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V24_${IP24}_${PT24}\nvless\u003A//${userID}\u0040${IP25}:${PT25}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V25_${IP25}_${PT25}\nvless\u003A//${userID}\u0040${IP26}:${PT26}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V26_${IP26}_${PT26}\nvless\u003A//${userID}\u0040${IP27}:${PT27}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V27_${IP27}_${PT27}\nvless\u003A//${userID}\u0040${IP28}:${PT28}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V28_${IP28}_${PT28}\nvless\u003A//${userID}\u0040${IP29}:${PT29}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V29_${IP29}_${PT29}\nvless\u003A//${userID}\u0040${IP30}:${PT30}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V30_${IP30}_${PT30}\nvless\u003A//${userID}\u0040${IP31}:${PT31}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V31_${IP31}_${PT31}\nvless\u003A//${userID}\u0040${IP32}:${PT32}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V32_${IP32}_${PT32}\nvless\u003A//${userID}\u0040${IP33}:${PT33}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V33_${IP33}_${PT33}\nvless\u003A//${userID}\u0040${IP34}:${PT34}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V34_${IP34}_${PT34}\nvless\u003A//${userID}\u0040${IP35}:${PT35}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V35_${IP35}_${PT35}\nvless\u003A//${userID}\u0040${IP36}:${PT36}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V36_${IP36}_${PT36}\nvless\u003A//${userID}\u0040${IP37}:${PT37}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V37_${IP37}_${PT37}\nvless\u003A//${userID}\u0040${IP38}:${PT38}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V38_${IP38}_${PT38}\nvless\u003A//${userID}\u0040${IP39}:${PT39}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V39_${IP39}_${PT39}\nvless\u003A//${userID}\u0040${IP40}:${PT40}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V40_${IP40}_${PT40}\nvless\u003A//${userID}\u0040${IP41}:${PT41}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V41_${IP41}_${PT41}\nvless\u003A//${userID}\u0040${IP42}:${PT42}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V42_${IP42}_${PT42}\nvless\u003A//${userID}\u0040${IP43}:${PT43}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V43_${IP43}_${PT43}\nvless\u003A//${userID}\u0040${IP44}:${PT44}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V44_${IP44}_${PT44}\nvless\u003A//${userID}\u0040${IP45}:${PT45}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V45_${IP45}_${PT45}\nvless\u003A//${userID}\u0040${IP46}:${PT46}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V46_${IP46}_${PT46}\nvless\u003A//${userID}\u0040${IP47}:${PT47}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V47_${IP47}_${PT47}\nvless\u003A//${userID}\u0040${IP48}:${PT48}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V48_${IP48}_${PT48}\nvless\u003A//${userID}\u0040${IP49}:${PT49}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V49_${IP49}_${PT49}\nvless\u003A//${userID}\u0040${IP50}:${PT50}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V50_${IP50}_${PT50}`);
-
-
-  const pgvlessshare = btoa(`vless\u003A//${userID}\u0040${IP26}:${PT26}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V26_${IP26}_${PT26}\nvless\u003A//${userID}\u0040${IP27}:${PT27}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V27_${IP27}_${PT27}\nvless\u003A//${userID}\u0040${IP28}:${PT28}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V28_${IP28}_${PT28}\nvless\u003A//${userID}\u0040${IP29}:${PT29}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V29_${IP29}_${PT29}\nvless\u003A//${userID}\u0040${IP30}:${PT30}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V30_${IP30}_${PT30}\nvless\u003A//${userID}\u0040${IP31}:${PT31}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V31_${IP31}_${PT31}\nvless\u003A//${userID}\u0040${IP32}:${PT32}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V32_${IP32}_${PT32}\nvless\u003A//${userID}\u0040${IP33}:${PT33}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V33_${IP33}_${PT33}\nvless\u003A//${userID}\u0040${IP34}:${PT34}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V34_${IP34}_${PT34}\nvless\u003A//${userID}\u0040${IP35}:${PT35}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V35_${IP35}_${PT35}\nvless\u003A//${userID}\u0040${IP36}:${PT36}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V36_${IP36}_${PT36}\nvless\u003A//${userID}\u0040${IP37}:${PT37}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V37_${IP37}_${PT37}\nvless\u003A//${userID}\u0040${IP38}:${PT38}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V38_${IP38}_${PT38}\nvless\u003A//${userID}\u0040${IP39}:${PT39}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V39_${IP39}_${PT39}\nvless\u003A//${userID}\u0040${IP40}:${PT40}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V40_${IP40}_${PT40}\nvless\u003A//${userID}\u0040${IP41}:${PT41}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V41_${IP41}_${PT41}\nvless\u003A//${userID}\u0040${IP42}:${PT42}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V42_${IP42}_${PT42}\nvless\u003A//${userID}\u0040${IP43}:${PT43}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V43_${IP43}_${PT43}\nvless\u003A//${userID}\u0040${IP44}:${PT44}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V44_${IP44}_${PT44}\nvless\u003A//${userID}\u0040${IP45}:${PT45}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V45_${IP45}_${PT45}\nvless\u003A//${userID}\u0040${IP46}:${PT46}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V46_${IP46}_${PT46}\nvless\u003A//${userID}\u0040${IP47}:${PT47}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V47_${IP47}_${PT47}\nvless\u003A//${userID}\u0040${IP48}:${PT48}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V48_${IP48}_${PT48}\nvless\u003A//${userID}\u0040${IP49}:${PT49}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V49_${IP49}_${PT49}\nvless\u003A//${userID}\u0040${IP50}:${PT50}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V50_${IP50}_${PT50}`);	
-
+  const wktrojanshare = btoa(`trojan://${Pswd}\u0040${IP1}:${PT1}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T1_${IP1}_${PT1}\ntrojan://${Pswd}\u0040${IP2}:${PT2}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T2_${IP2}_${PT2}\ntrojan://${Pswd}\u0040${IP3}:${PT3}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T3_${IP3}_${PT3}\ntrojan://${Pswd}\u0040${IP4}:${PT4}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T4_${IP4}_${PT4}\ntrojan://${Pswd}\u0040${IP5}:${PT5}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T5_${IP5}_${PT5}\ntrojan://${Pswd}\u0040${IP6}:${PT6}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T6_${IP6}_${PT6}\ntrojan://${Pswd}\u0040${IP7}:${PT7}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T7_${IP7}_${PT7}\ntrojan://${Pswd}\u0040${IP8}:${PT8}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T8_${IP8}_${PT8}\ntrojan://${Pswd}\u0040${IP9}:${PT9}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T9_${IP9}_${PT9}\ntrojan://${Pswd}\u0040${IP10}:${PT10}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T10_${IP10}_${PT10}\ntrojan://${Pswd}\u0040${IP11}:${PT11}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T11_${IP11}_${PT11}\ntrojan://${Pswd}\u0040${IP12}:${PT12}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T12_${IP12}_${PT12}\ntrojan://${Pswd}\u0040${IP13}:${PT13}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T13_${IP13}_${PT13}\ntrojan://${Pswd}\u0040${IP14}:${PT14}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T14_${IP14}_${PT14}\ntrojan://${Pswd}\u0040${IP15}:${PT15}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T15_${IP15}_${PT15}\ntrojan://${Pswd}\u0040${IP16}:${PT16}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T16_${IP16}_${PT16}\ntrojan://${Pswd}\u0040${IP17}:${PT17}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T17_${IP17}_${PT17}\ntrojan://${Pswd}\u0040${IP18}:${PT18}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T18_${IP18}_${PT18}\ntrojan://${Pswd}\u0040${IP19}:${PT19}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T19_${IP19}_${PT19}\ntrojan://${Pswd}\u0040${IP20}:${PT20}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T20_${IP20}_${PT20}\ntrojan://${Pswd}\u0040${IP21}:${PT21}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T21_${IP21}_${PT21}\ntrojan://${Pswd}\u0040${IP22}:${PT22}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T22_${IP22}_${PT22}\ntrojan://${Pswd}\u0040${IP23}:${PT23}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T23_${IP23}_${PT23}\ntrojan://${Pswd}\u0040${IP24}:${PT24}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T24_${IP24}_${PT24}\ntrojan://${Pswd}\u0040${IP25}:${PT25}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T25_${IP25}_${PT25}\ntrojan://${Pswd}\u0040${IP26}:${PT26}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T26_${IP26}_${PT26}\ntrojan://${Pswd}\u0040${IP27}:${PT27}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T27_${IP27}_${PT27}\ntrojan://${Pswd}\u0040${IP28}:${PT28}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T28_${IP28}_${PT28}\ntrojan://${Pswd}\u0040${IP29}:${PT29}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T29_${IP29}_${PT29}\ntrojan://${Pswd}\u0040${IP30}:${PT30}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T30_${IP30}_${PT30}\ntrojan://${Pswd}\u0040${IP31}:${PT31}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T31_${IP31}_${PT31}\ntrojan://${Pswd}\u0040${IP32}:${PT32}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T32_${IP32}_${PT32}\ntrojan://${Pswd}\u0040${IP33}:${PT33}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T33_${IP33}_${PT33}\ntrojan://${Pswd}\u0040${IP34}:${PT34}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T34_${IP34}_${PT34}\ntrojan://${Pswd}\u0040${IP35}:${PT35}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T35_${IP35}_${PT35}\ntrojan://${Pswd}\u0040${IP36}:${PT36}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T36_${IP36}_${PT36}\ntrojan://${Pswd}\u0040${IP37}:${PT37}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T37_${IP37}_${PT37}\ntrojan://${Pswd}\u0040${IP38}:${PT38}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T38_${IP38}_${PT38}\ntrojan://${Pswd}\u0040${IP39}:${PT39}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T39_${IP39}_${PT39}\ntrojan://${Pswd}\u0040${IP40}:${PT40}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T40_${IP40}_${PT40}\ntrojan://${Pswd}\u0040${IP41}:${PT41}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T41_${IP41}_${PT41}\ntrojan://${Pswd}\u0040${IP42}:${PT42}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T42_${IP42}_${PT42}\ntrojan://${Pswd}\u0040${IP43}:${PT43}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T43_${IP43}_${PT43}\ntrojan://${Pswd}\u0040${IP44}:${PT44}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T44_${IP44}_${PT44}\ntrojan://${Pswd}\u0040${IP45}:${PT45}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T45_${IP45}_${PT45}\ntrojan://${Pswd}\u0040${IP46}:${PT46}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T46_${IP46}_${PT46}\ntrojan://${Pswd}\u0040${IP47}:${PT47}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T47_${IP47}_${PT47}\ntrojan://${Pswd}\u0040${IP48}:${PT48}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T48_${IP48}_${PT48}\ntrojan://${Pswd}\u0040${IP49}:${PT49}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T49_${IP49}_${PT49}\ntrojan://${Pswd}\u0040${IP50}:${PT50}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T50_${IP50}_${PT50}`);
+	
+  const pgtrojanshare = btoa(`trojan://${Pswd}\u0040${IP26}:${PT26}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T26_${IP26}_${PT26}\ntrojan://${Pswd}\u0040${IP27}:${PT27}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T27_${IP27}_${PT27}\ntrojan://${Pswd}\u0040${IP28}:${PT28}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T28_${IP28}_${PT28}\ntrojan://${Pswd}\u0040${IP29}:${PT29}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T29_${IP29}_${PT29}\ntrojan://${Pswd}\u0040${IP30}:${PT30}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T30_${IP30}_${PT30}\ntrojan://${Pswd}\u0040${IP31}:${PT31}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T31_${IP31}_${PT31}\ntrojan://${Pswd}\u0040${IP32}:${PT32}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T32_${IP32}_${PT32}\ntrojan://${Pswd}\u0040${IP33}:${PT33}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T33_${IP33}_${PT33}\ntrojan://${Pswd}\u0040${IP34}:${PT34}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T34_${IP34}_${PT34}\ntrojan://${Pswd}\u0040${IP35}:${PT35}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T35_${IP35}_${PT35}\ntrojan://${Pswd}\u0040${IP36}:${PT36}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T36_${IP36}_${PT36}\ntrojan://${Pswd}\u0040${IP37}:${PT37}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T37_${IP37}_${PT37}\ntrojan://${Pswd}\u0040${IP38}:${PT38}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T38_${IP38}_${PT38}\ntrojan://${Pswd}\u0040${IP39}:${PT39}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T39_${IP39}_${PT39}\ntrojan://${Pswd}\u0040${IP40}:${PT40}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T40_${IP40}_${PT40}\ntrojan://${Pswd}\u0040${IP41}:${PT41}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T41_${IP41}_${PT41}\ntrojan://${Pswd}\u0040${IP42}:${PT42}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T42_${IP42}_${PT42}\ntrojan://${Pswd}\u0040${IP43}:${PT43}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T43_${IP43}_${PT43}\ntrojan://${Pswd}\u0040${IP44}:${PT44}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T44_${IP44}_${PT44}\ntrojan://${Pswd}\u0040${IP45}:${PT45}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T45_${IP45}_${PT45}\ntrojan://${Pswd}\u0040${IP46}:${PT46}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T46_${IP46}_${PT46}\ntrojan://${Pswd}\u0040${IP47}:${PT47}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T47_${IP47}_${PT47}\ntrojan://${Pswd}\u0040${IP48}:${PT48}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T48_${IP48}_${PT48}\ntrojan://${Pswd}\u0040${IP49}:${PT49}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T49_${IP49}_${PT49}\ntrojan://${Pswd}\u0040${IP50}:${PT50}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T50_${IP50}_${PT50}`);
 	
   const noteshow = note.replace(/\n/g, '<br>');
   const displayHtml = `
@@ -1040,15 +728,15 @@ ${displayHtml}
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h1>Cloudflare-workers/pages-vless代理脚本 V24.12.13</h1>
-	    <hr>
+            <h1>Cloudflare-workers/pages-trojan代理脚本 V24.12.13</h1>
+			<hr>
             <p>${noteshow}</p>
             <hr>
-	    <hr>
-	    <hr>
+			<hr>
+			<hr>
             <br>
             <br>
-            <h3>1：CF-workers-vless+ws节点</h3>
+            <h3>1：CF-workers-trojan+ws节点</h3>
 			<table class="table">
 				<thead>
 					<tr>
@@ -1059,8 +747,8 @@ ${displayHtml}
 				<tbody>
 					<tr>
 						<td class="limited-width">关闭了TLS加密，无视域名阻断</td>
-						<td class="limited-width">${wvlessws}</td>
-						<td><button class="btn btn-primary" onclick="copyToClipboard('${wvlessws}')">点击复制链接</button></td>
+						<td class="limited-width">${wtrojanws}</td>
+						<td><button class="btn btn-primary" onclick="copyToClipboard('${wtrojanws}')">点击复制链接</button></td>
 					</tr>
 				</tbody>
 			</table>
@@ -1068,18 +756,18 @@ ${displayHtml}
             <ul>
                 <li>客户端地址(address)：自定义的域名 或者 优选域名 或者 优选IP 或者 反代IP</li>
                 <li>端口(port)：7个http端口可任意选择(80、8080、8880、2052、2082、2086、2095)，或反代IP对应端口</li>
-                <li>用户ID(uuid)：${userID}</li>
+                <li>密码(password)：${Pswd}</li>
                 <li>传输协议(network)：ws 或者 websocket</li>
                 <li>伪装域名(host)：${hostName}</li>
                 <li>路径(path)：/?ed=2560</li>
-		<li>传输安全(TLS)：关闭</li>
+                <li>传输安全(TLS)：关闭</li>
             </ul>
             <hr>
 			<hr>
 			<hr>
             <br>
             <br>
-            <h3>2：CF-workers-vless+ws+tls节点</h3>
+            <h3>2：CF-workers-trojan+ws+tls</h3>
 			<table class="table">
 				<thead>
 					<tr>
@@ -1090,8 +778,8 @@ ${displayHtml}
 				<tbody>
 					<tr>
 						<td class="limited-width">启用了TLS加密，<br>如果客户端支持分片(Fragment)功能，建议开启，防止域名阻断</td>
-						<td class="limited-width">${pvlesswstls}</td>	
-						<td><button class="btn btn-primary" onclick="copyToClipboard('${pvlesswstls}')">点击复制链接</button></td>
+						<td class="limited-width">${ptrojanwstls}</td>	
+						<td><button class="btn btn-primary" onclick="copyToClipboard('${ptrojanwstls}')">点击复制链接</button></td>
 					</tr>
 				</tbody>
 			</table>
@@ -1099,7 +787,7 @@ ${displayHtml}
             <ul>
                 <li>客户端地址(address)：自定义的域名 或者 优选域名 或者 优选IP 或者 反代IP</li>
                 <li>端口(port)：6个https端口可任意选择(443、8443、2053、2083、2087、2096)，或反代IP对应端口</li>
-                <li>用户ID(uuid)：${userID}</li>
+                <li>密码(password)：${Pswd}</li>
                 <li>传输协议(network)：ws 或者 websocket</li>
                 <li>伪装域名(host)：${hostName}</li>
                 <li>路径(path)：/?ed=2560</li>
@@ -1113,24 +801,22 @@ ${displayHtml}
 			<br>
 			<h3>3：聚合通用、Clash-meta、Sing-box订阅链接如下：</h3>
 			<hr>
-			<p>注意：<br>1、默认每个订阅链接包含TLS+非TLS共13个端口节点<br>2、当前workers域名作为订阅链接，需通过代理进行订阅更新<br>3、如使用的客户端不支持分片功能，则TLS节点不可用</p>
-			<hr>
+			<p>注意：<br>1、默认每个订阅链接包含TLS+非TLS共13个端口节点 (Clash节点仅6个TLS节点)<br>2、当前workers域名作为订阅链接，需通过代理进行订阅更新<br>3、如使用的客户端不支持分片功能，则TLS节点不可用</p>	
+                        <hr>
 
 
 			<table class="table">
 					<thead>
 						<tr>
-							<th>聚合通用分享链接 (可直接导入客户端)：</th>
+							<th>聚合通用分享链接 (可直接导入客户端，80系非tls节点在某些客户端可能被强制开启TLS，且不可用)：</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr>
-							<td><button class="btn btn-primary" onclick="copyToClipboard('${wkvlessshare}')">点击复制链接</button></td>
+							<td><button class="btn btn-primary" onclick="copyToClipboard('${wktrojanshare}')">点击复制链接</button></td>
 						</tr>
 					</tbody>
 				</table>
-
-
    
 			<table class="table">
 					<thead>
@@ -1189,7 +875,7 @@ ${displayHtml}
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h1>Cloudflare-workers/pages-vless代理脚本 V24.12.13</h1>
+            <h1>Cloudflare-workers/pages-trojan代理脚本 V24.12.13</h1>
 			<hr>
             <p>${noteshow}</p>
             <hr>
@@ -1197,7 +883,7 @@ ${displayHtml}
 			<hr>
             <br>
             <br>
-            <h3>1：CF-pages/workers/自定义域-vless+ws+tls节点</h3>
+            <h3>1：CF-pages/workers/自定义域-trojan+ws+tls节点</h3>
 			<table class="table">
 				<thead>
 					<tr>
@@ -1208,8 +894,8 @@ ${displayHtml}
 				<tbody>
 					<tr>
 						<td class="limited-width">启用了TLS加密，<br>如果客户端支持分片(Fragment)功能，可开启，防止域名阻断</td>
-						<td class="limited-width">${pvlesswstls}</td>
-						<td><button class="btn btn-primary" onclick="copyToClipboard('${pvlesswstls}')">点击复制链接</button></td>
+						<td class="limited-width">${ptrojanwstls}</td>
+						<td><button class="btn btn-primary" onclick="copyToClipboard('${ptrojanwstls}')">点击复制链接</button></td>
 					</tr>
 				</tbody>
 			</table>
@@ -1217,7 +903,7 @@ ${displayHtml}
             <ul>
                 <li>客户端地址(address)：自定义的域名 或者 优选域名 或者 优选IP 或者 反代IP</li>
                 <li>端口(port)：6个https端口可任意选择(443、8443、2053、2083、2087、2096)，或反代IP对应端口</li>
-                <li>用户ID(uuid)：${userID}</li>
+                <li>密码(password)：${Pswd}</li>
                 <li>传输协议(network)：ws 或者 websocket</li>
                 <li>伪装域名(host)：${hostName}</li>
                 <li>路径(path)：/?ed=2560</li>
@@ -1234,7 +920,6 @@ ${displayHtml}
 			<p>注意：以下订阅链接仅6个TLS端口节点</p>
 			<hr>
 
-
 			<table class="table">
 					<thead>
 						<tr>
@@ -1243,11 +928,10 @@ ${displayHtml}
 					</thead>
 					<tbody>
 						<tr>
-							<td><button class="btn btn-primary" onclick="copyToClipboard('${pgvlessshare}')">点击复制链接</button></td>
+							<td><button class="btn btn-primary" onclick="copyToClipboard('${pgtrojanshare}')">点击复制链接</button></td>
 						</tr>
 					</tbody>
 				</table>
-
 
 
 			<table class="table">
@@ -1301,12 +985,12 @@ ${displayHtml}
   }
 }
 
-function gettyConfig(userID, hostName) {
-	const vlessshare = btoa(`vless\u003A//${userID}\u0040${IP1}:${PT1}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V1_${IP1}_${PT1}\nvless\u003A//${userID}\u0040${IP2}:${PT2}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V2_${IP2}_${PT2}\nvless\u003A//${userID}\u0040${IP3}:${PT3}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V3_${IP3}_${PT3}\nvless\u003A//${userID}\u0040${IP4}:${PT4}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V4_${IP4}_${PT4}\nvless\u003A//${userID}\u0040${IP5}:${PT5}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V5_${IP5}_${PT5}\nvless\u003A//${userID}\u0040${IP6}:${PT6}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V6_${IP6}_${PT6}\nvless\u003A//${userID}\u0040${IP7}:${PT7}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V7_${IP7}_${PT7}\nvless\u003A//${userID}\u0040${IP8}:${PT8}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V8_${IP8}_${PT8}\nvless\u003A//${userID}\u0040${IP9}:${PT9}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V9_${IP9}_${PT9}\nvless\u003A//${userID}\u0040${IP10}:${PT10}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V10_${IP10}_${PT10}\nvless\u003A//${userID}\u0040${IP11}:${PT11}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V11_${IP11}_${PT11}\nvless\u003A//${userID}\u0040${IP12}:${PT12}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V12_${IP12}_${PT12}\nvless\u003A//${userID}\u0040${IP13}:${PT13}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V13_${IP13}_${PT13}\nvless\u003A//${userID}\u0040${IP14}:${PT14}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V14_${IP14}_${PT14}\nvless\u003A//${userID}\u0040${IP15}:${PT15}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V15_${IP15}_${PT15}\nvless\u003A//${userID}\u0040${IP16}:${PT16}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V16_${IP16}_${PT16}\nvless\u003A//${userID}\u0040${IP17}:${PT17}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V17_${IP17}_${PT17}\nvless\u003A//${userID}\u0040${IP18}:${PT18}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V18_${IP18}_${PT18}\nvless\u003A//${userID}\u0040${IP19}:${PT19}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V19_${IP19}_${PT19}\nvless\u003A//${userID}\u0040${IP20}:${PT20}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V20_${IP20}_${PT20}\nvless\u003A//${userID}\u0040${IP21}:${PT21}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V21_${IP21}_${PT21}\nvless\u003A//${userID}\u0040${IP22}:${PT22}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V22_${IP22}_${PT22}\nvless\u003A//${userID}\u0040${IP23}:${PT23}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V23_${IP23}_${PT23}\nvless\u003A//${userID}\u0040${IP24}:${PT24}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V24_${IP24}_${PT24}\nvless\u003A//${userID}\u0040${IP25}:${PT25}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V25_${IP25}_${PT25}\nvless\u003A//${userID}\u0040${IP26}:${PT26}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V26_${IP26}_${PT26}\nvless\u003A//${userID}\u0040${IP27}:${PT27}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V27_${IP27}_${PT27}\nvless\u003A//${userID}\u0040${IP28}:${PT28}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V28_${IP28}_${PT28}\nvless\u003A//${userID}\u0040${IP29}:${PT29}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V29_${IP29}_${PT29}\nvless\u003A//${userID}\u0040${IP30}:${PT30}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V30_${IP30}_${PT30}\nvless\u003A//${userID}\u0040${IP31}:${PT31}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V31_${IP31}_${PT31}\nvless\u003A//${userID}\u0040${IP32}:${PT32}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V32_${IP32}_${PT32}\nvless\u003A//${userID}\u0040${IP33}:${PT33}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V33_${IP33}_${PT33}\nvless\u003A//${userID}\u0040${IP34}:${PT34}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V34_${IP34}_${PT34}\nvless\u003A//${userID}\u0040${IP35}:${PT35}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V35_${IP35}_${PT35}\nvless\u003A//${userID}\u0040${IP36}:${PT36}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V36_${IP36}_${PT36}\nvless\u003A//${userID}\u0040${IP37}:${PT37}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V37_${IP37}_${PT37}\nvless\u003A//${userID}\u0040${IP38}:${PT38}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V38_${IP38}_${PT38}\nvless\u003A//${userID}\u0040${IP39}:${PT39}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V39_${IP39}_${PT39}\nvless\u003A//${userID}\u0040${IP40}:${PT40}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V40_${IP40}_${PT40}\nvless\u003A//${userID}\u0040${IP41}:${PT41}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V41_${IP41}_${PT41}\nvless\u003A//${userID}\u0040${IP42}:${PT42}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V42_${IP42}_${PT42}\nvless\u003A//${userID}\u0040${IP43}:${PT43}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V43_${IP43}_${PT43}\nvless\u003A//${userID}\u0040${IP44}:${PT44}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V44_${IP44}_${PT44}\nvless\u003A//${userID}\u0040${IP45}:${PT45}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V45_${IP45}_${PT45}\nvless\u003A//${userID}\u0040${IP46}:${PT46}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V46_${IP46}_${PT46}\nvless\u003A//${userID}\u0040${IP47}:${PT47}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V47_${IP47}_${PT47}\nvless\u003A//${userID}\u0040${IP48}:${PT48}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V48_${IP48}_${PT48}\nvless\u003A//${userID}\u0040${IP49}:${PT49}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V49_${IP49}_${PT49}\nvless\u003A//${userID}\u0040${IP50}:${PT50}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V50_${IP50}_${PT50}`);
-		return `${vlessshare}`
-	}
+function gettyConfig(Pswd, hostName) {
+  const trojanshare = btoa(`trojan://${Pswd}\u0040${IP1}:${PT1}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T1_${IP1}_${PT1}\ntrojan://${Pswd}\u0040${IP2}:${PT2}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T2_${IP2}_${PT2}\ntrojan://${Pswd}\u0040${IP3}:${PT3}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T3_${IP3}_${PT3}\ntrojan://${Pswd}\u0040${IP4}:${PT4}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T4_${IP4}_${PT4}\ntrojan://${Pswd}\u0040${IP5}:${PT5}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T5_${IP5}_${PT5}\ntrojan://${Pswd}\u0040${IP6}:${PT6}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T6_${IP6}_${PT6}\ntrojan://${Pswd}\u0040${IP7}:${PT7}?encryption=none&security=none&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T7_${IP7}_${PT7}\ntrojan://${Pswd}\u0040${IP8}:${PT8}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T8_${IP8}_${PT8}\ntrojan://${Pswd}\u0040${IP9}:${PT9}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T9_${IP9}_${PT9}\ntrojan://${Pswd}\u0040${IP10}:${PT10}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T10_${IP10}_${PT10}\ntrojan://${Pswd}\u0040${IP11}:${PT11}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T11_${IP11}_${PT11}\ntrojan://${Pswd}\u0040${IP12}:${PT12}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T12_${IP12}_${PT12}\ntrojan://${Pswd}\u0040${IP13}:${PT13}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T13_${IP13}_${PT13}\ntrojan://${Pswd}\u0040${IP14}:${PT14}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T14_${IP14}_${PT14}\ntrojan://${Pswd}\u0040${IP15}:${PT15}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T15_${IP15}_${PT15}\ntrojan://${Pswd}\u0040${IP16}:${PT16}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T16_${IP16}_${PT16}\ntrojan://${Pswd}\u0040${IP17}:${PT17}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T17_${IP17}_${PT17}\ntrojan://${Pswd}\u0040${IP18}:${PT18}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T18_${IP18}_${PT18}\ntrojan://${Pswd}\u0040${IP19}:${PT19}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T19_${IP19}_${PT19}\ntrojan://${Pswd}\u0040${IP20}:${PT20}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T20_${IP20}_${PT20}\ntrojan://${Pswd}\u0040${IP21}:${PT21}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T21_${IP21}_${PT21}\ntrojan://${Pswd}\u0040${IP22}:${PT22}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T22_${IP22}_${PT22}\ntrojan://${Pswd}\u0040${IP23}:${PT23}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T23_${IP23}_${PT23}\ntrojan://${Pswd}\u0040${IP24}:${PT24}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T24_${IP24}_${PT24}\ntrojan://${Pswd}\u0040${IP25}:${PT25}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T25_${IP25}_${PT25}\ntrojan://${Pswd}\u0040${IP26}:${PT26}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T26_${IP26}_${PT26}\ntrojan://${Pswd}\u0040${IP27}:${PT27}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T27_${IP27}_${PT27}\ntrojan://${Pswd}\u0040${IP28}:${PT28}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T28_${IP28}_${PT28}\ntrojan://${Pswd}\u0040${IP29}:${PT29}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T29_${IP29}_${PT29}\ntrojan://${Pswd}\u0040${IP30}:${PT30}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T30_${IP30}_${PT30}\ntrojan://${Pswd}\u0040${IP31}:${PT31}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T31_${IP31}_${PT31}\ntrojan://${Pswd}\u0040${IP32}:${PT32}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T32_${IP32}_${PT32}\ntrojan://${Pswd}\u0040${IP33}:${PT33}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T33_${IP33}_${PT33}\ntrojan://${Pswd}\u0040${IP34}:${PT34}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T34_${IP34}_${PT34}\ntrojan://${Pswd}\u0040${IP35}:${PT35}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T35_${IP35}_${PT35}\ntrojan://${Pswd}\u0040${IP36}:${PT36}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T36_${IP36}_${PT36}\ntrojan://${Pswd}\u0040${IP37}:${PT37}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T37_${IP37}_${PT37}\ntrojan://${Pswd}\u0040${IP38}:${PT38}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T38_${IP38}_${PT38}\ntrojan://${Pswd}\u0040${IP39}:${PT39}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T39_${IP39}_${PT39}\ntrojan://${Pswd}\u0040${IP40}:${PT40}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T40_${IP40}_${PT40}\ntrojan://${Pswd}\u0040${IP41}:${PT41}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T41_${IP41}_${PT41}\ntrojan://${Pswd}\u0040${IP42}:${PT42}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T42_${IP42}_${PT42}\ntrojan://${Pswd}\u0040${IP43}:${PT43}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T43_${IP43}_${PT43}\ntrojan://${Pswd}\u0040${IP44}:${PT44}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T44_${IP44}_${PT44}\ntrojan://${Pswd}\u0040${IP45}:${PT45}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T45_${IP45}_${PT45}\ntrojan://${Pswd}\u0040${IP46}:${PT46}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T46_${IP46}_${PT46}\ntrojan://${Pswd}\u0040${IP47}:${PT47}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T47_${IP47}_${PT47}\ntrojan://${Pswd}\u0040${IP48}:${PT48}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T48_${IP48}_${PT48}\ntrojan://${Pswd}\u0040${IP49}:${PT49}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T49_${IP49}_${PT49}\ntrojan://${Pswd}\u0040${IP50}:${PT50}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T50_${IP50}_${PT50}`);
+  return `${trojanshare}`
+}
 
-function getclConfig(userID, hostName) {
+function getclConfig(Pswd, hostName) {
 return `
 port: 7890
 allow-lan: true
@@ -1337,650 +1021,325 @@ dns:
       - 240.0.0.0/4
 
 proxies:
-- name: CF_V1_${IP1}_${PT1}
-  type: vless
-  server: ${IP1}
-  port: ${PT1}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V2_${IP2}_${PT2}
-  type: vless
-  server: ${IP2}
-  port: ${PT2}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V3_${IP3}_${PT3}
-  type: vless
-  server: ${IP3}
-  port: ${PT3}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V4_${IP4}_${PT4}
-  type: vless
-  server: ${IP4}
-  port: ${PT4}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V5_${IP5}_${PT5}
-  type: vless
-  server: ${IP5}
-  port: ${PT5}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V6_${IP6}_${PT6}
-  type: vless
-  server: ${IP6}
-  port: ${PT6}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V7_${IP7}_${PT7}
-  type: vless
-  server: ${IP7}
-  port: ${PT7}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V8_${IP8}_${PT8}
-  type: vless
-  server: ${IP8}
-  port: ${PT8}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V9_${IP9}_${PT9}
-  type: vless
-  server: ${IP9}
-  port: ${PT9}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V10_${IP10}_${PT10}
-  type: vless
-  server: ${IP10}
-  port: ${PT10}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V11_${IP11}_${PT11}
-  type: vless
-  server: ${IP11}
-  port: ${PT11}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V12_${IP12}_${PT12}
-  type: vless
-  server: ${IP12}
-  port: ${PT12}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V13_${IP13}_${PT13}
-  type: vless
-  server: ${IP13}
-  port: ${PT13}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V14_${IP14}_${PT14}
-  type: vless
-  server: ${IP14}
-  port: ${PT14}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V15_${IP15}_${PT15}
-  type: vless
-  server: ${IP15}
-  port: ${PT15}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V16_${IP16}_${PT16}
-  type: vless
-  server: ${IP16}
-  port: ${PT16}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V17_${IP17}_${PT17}
-  type: vless
-  server: ${IP17}
-  port: ${PT17}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V18_${IP18}_${PT18}
-  type: vless
-  server: ${IP18}
-  port: ${PT18}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V19_${IP19}_${PT19}
-  type: vless
-  server: ${IP19}
-  port: ${PT19}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V20_${IP20}_${PT20}
-  type: vless
-  server: ${IP20}
-  port: ${PT20}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V21_${IP21}_${PT21}
-  type: vless
-  server: ${IP21}
-  port: ${PT21}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V22_${IP22}_${PT22}
-  type: vless
-  server: ${IP22}
-  port: ${PT22}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V23_${IP23}_${PT23}
-  type: vless
-  server: ${IP23}
-  port: ${PT23}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V24_${IP24}_${PT24}
-  type: vless
-  server: ${IP24}
-  port: ${PT24}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V25_${IP25}_${PT25}
-  type: vless
-  server: ${IP25}
-  port: ${PT25}
-  uuid: ${userID}
-  udp: false
-  tls: false
-  network: ws
-  ws-opts:
-    path: "/?ed=2560"
-    headers:
-      Host: ${hostName}
-
-- name: CF_V26_${IP26}_${PT26}
-  type: vless
+- name: CF_T26_${IP26}_${PT26}
+  type: trojan
   server: ${IP26}
   port: ${PT26}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V27_${IP27}_${PT27}
-  type: vless
+
+- name: CF_T27_${IP27}_${PT27}
+  type: trojan
   server: ${IP27}
   port: ${PT27}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V28_${IP28}_${PT28}
-  type: vless
+
+- name: CF_T28_${IP28}_${PT28}
+  type: trojan
   server: ${IP28}
   port: ${PT28}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V29_${IP29}_${PT29}
-  type: vless
+
+- name: CF_T29_${IP29}_${PT29}
+  type: trojan
   server: ${IP29}
   port: ${PT29}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V30_${IP30}_${PT30}
-  type: vless
+
+- name: CF_T30_${IP30}_${PT30}
+  type: trojan
   server: ${IP30}
   port: ${PT30}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V31_${IP31}_${PT31}
-  type: vless
+
+- name: CF_T31_${IP31}_${PT31}
+  type: trojan
   server: ${IP31}
   port: ${PT31}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V32_${IP32}_${PT32}
-  type: vless
+
+- name: CF_T32_${IP32}_${PT32}
+  type: trojan
   server: ${IP32}
   port: ${PT32}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V33_${IP33}_${PT33}
-  type: vless
+
+- name: CF_T33_${IP33}_${PT33}
+  type: trojan
   server: ${IP33}
   port: ${PT33}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V34_${IP34}_${PT34}
-  type: vless
+
+- name: CF_T34_${IP34}_${PT34}
+  type: trojan
   server: ${IP34}
   port: ${PT34}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V35_${IP35}_${PT35}
-  type: vless
+
+- name: CF_T35_${IP35}_${PT35}
+  type: trojan
   server: ${IP35}
   port: ${PT35}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V36_${IP36}_${PT36}
-  type: vless
+
+- name: CF_T36_${IP36}_${PT36}
+  type: trojan
   server: ${IP36}
   port: ${PT36}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V37_${IP37}_${PT37}
-  type: vless
+
+- name: CF_T37_${IP37}_${PT37}
+  type: trojan
   server: ${IP37}
   port: ${PT37}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V38_${IP38}_${PT38}
-  type: vless
+
+- name: CF_T38_${IP38}_${PT38}
+  type: trojan
   server: ${IP38}
   port: ${PT38}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V39_${IP39}_${PT39}
-  type: vless
+
+- name: CF_T39_${IP39}_${PT39}
+  type: trojan
   server: ${IP39}
   port: ${PT39}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V40_${IP40}_${PT40}
-  type: vless
+
+- name: CF_T40_${IP40}_${PT40}
+  type: trojan
   server: ${IP40}
   port: ${PT40}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
       
-- name: CF_V41_${IP41}_${PT41}
-  type: vless
+- name: CF_T41_${IP41}_${PT41}
+  type: trojan
   server: ${IP41}
   port: ${PT41}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V42_${IP42}_${PT42}
-  type: vless
+
+- name: CF_T42_${IP42}_${PT42}
+  type: trojan
   server: ${IP42}
   port: ${PT42}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V43_${IP43}_${PT43}
-  type: vless
+
+- name: CF_T43_${IP43}_${PT43}
+  type: trojan
   server: ${IP43}
   port: ${PT43}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V44_${IP44}_${PT44}
-  type: vless
+
+- name: CF_T44_${IP44}_${PT44}
+  type: trojan
   server: ${IP44}
   port: ${PT44}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V45_${IP45}_${PT45}
-  type: vless
+
+- name: CF_T45_${IP45}_${PT45}
+  type: trojan
   server: ${IP45}
   port: ${PT45}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V46_${IP46}_${PT46}
-  type: vless
+
+- name: CF_T46_${IP46}_${PT46}
+  type: trojan
   server: ${IP46}
   port: ${PT46}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V47_${IP47}_${PT47}
-  type: vless
+
+- name: CF_T47_${IP47}_${PT47}
+  type: trojan
   server: ${IP47}
   port: ${PT47}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V48_${IP48}_${PT48}
-  type: vless
+
+- name: CF_T48_${IP48}_${PT48}
+  type: trojan
   server: ${IP48}
   port: ${PT48}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V49_${IP49}_${PT49}
-  type: vless
+
+- name: CF_T49_${IP49}_${PT49}
+  type: trojan
   server: ${IP49}
   port: ${PT49}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V50_${IP50}_${PT50}
-  type: vless
+
+- name: CF_T50_${IP50}_${PT50}
+  type: trojan
   server: ${IP50}
   port: ${PT50}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
   ws-opts:
     path: "/?ed=2560"
@@ -1993,56 +1352,31 @@ proxy-groups:
   url: http://www.gstatic.com/generate_204
   interval: 300
   proxies:
-    - CF_V1_${IP1}_${PT1}
-    - CF_V2_${IP2}_${PT2}
-    - CF_V3_${IP3}_${PT3}
-    - CF_V4_${IP4}_${PT4}
-    - CF_V5_${IP5}_${PT5}
-    - CF_V6_${IP6}_${PT6}
-    - CF_V7_${IP7}_${PT7}
-    - CF_V8_${IP8}_${PT8}
-    - CF_V9_${IP9}_${PT9}
-    - CF_V10_${IP10}_${PT10}
-    - CF_V11_${IP11}_${PT11}
-    - CF_V12_${IP12}_${PT12}
-    - CF_V13_${IP13}_${PT13}
-    - CF_V14_${IP14}_${PT14}
-    - CF_V15_${IP15}_${PT15}
-    - CF_V16_${IP16}_${PT16}
-    - CF_V17_${IP17}_${PT17}
-    - CF_V18_${IP18}_${PT18}
-    - CF_V19_${IP19}_${PT19}
-    - CF_V20_${IP20}_${PT20}
-    - CF_V21_${IP21}_${PT21}
-    - CF_V22_${IP22}_${PT22}
-    - CF_V23_${IP23}_${PT23}
-    - CF_V24_${IP24}_${PT24}
-    - CF_V25_${IP25}_${PT25}
-    - CF_V26_${IP26}_${PT26}
-    - CF_V27_${IP27}_${PT27}
-    - CF_V28_${IP28}_${PT28}
-    - CF_V29_${IP29}_${PT29}
-    - CF_V30_${IP30}_${PT30}
-    - CF_V31_${IP31}_${PT31}
-    - CF_V32_${IP32}_${PT32}
-    - CF_V33_${IP33}_${PT33}
-    - CF_V34_${IP34}_${PT34}
-    - CF_V35_${IP35}_${PT35}
-    - CF_V36_${IP36}_${PT36}
-    - CF_V37_${IP37}_${PT37}
-    - CF_V38_${IP38}_${PT38}
-    - CF_V39_${IP39}_${PT39}
-    - CF_V40_${IP40}_${PT40}
-    - CF_V41_${IP41}_${PT41}
-    - CF_V42_${IP42}_${PT42}
-    - CF_V43_${IP43}_${PT43}
-    - CF_V44_${IP44}_${PT44}
-    - CF_V45_${IP45}_${PT45}
-    - CF_V46_${IP46}_${PT46}
-    - CF_V47_${IP47}_${PT47}
-    - CF_V48_${IP48}_${PT48}
-    - CF_V49_${IP49}_${PT49}
-    - CF_V50_${IP50}_${PT50}
+    - CF_T26_${IP26}_${PT26}
+    - CF_T27_${IP27}_${PT27}
+    - CF_T28_${IP28}_${PT28}
+    - CF_T29_${IP29}_${PT29}
+    - CF_T30_${IP30}_${PT30}
+    - CF_T31_${IP31}_${PT31}
+    - CF_T32_${IP32}_${PT32}
+    - CF_T33_${IP33}_${PT33}
+    - CF_T34_${IP34}_${PT34}
+    - CF_T35_${IP35}_${PT35}
+    - CF_T36_${IP36}_${PT36}
+    - CF_T37_${IP37}_${PT37}
+    - CF_T38_${IP38}_${PT38}
+    - CF_T39_${IP39}_${PT39}
+    - CF_T40_${IP40}_${PT40}
+    - CF_T41_${IP41}_${PT41}
+    - CF_T42_${IP42}_${PT42}
+    - CF_T43_${IP43}_${PT43}
+    - CF_T44_${IP44}_${PT44}
+    - CF_T45_${IP45}_${PT45}
+    - CF_T46_${IP46}_${PT46}
+    - CF_T47_${IP47}_${PT47}
+    - CF_T48_${IP48}_${PT48}
+    - CF_T49_${IP49}_${PT49}
+    - CF_T50_${IP50}_${PT50}
 
 - name: 自动选择
   type: url-test
@@ -2050,56 +1384,31 @@ proxy-groups:
   interval: 300
   tolerance: 50
   proxies:
-    - CF_V1_${IP1}_${PT1}
-    - CF_V2_${IP2}_${PT2}
-    - CF_V3_${IP3}_${PT3}
-    - CF_V4_${IP4}_${PT4}
-    - CF_V5_${IP5}_${PT5}
-    - CF_V6_${IP6}_${PT6}
-    - CF_V7_${IP7}_${PT7}
-    - CF_V8_${IP8}_${PT8}
-    - CF_V9_${IP9}_${PT9}
-    - CF_V10_${IP10}_${PT10}
-    - CF_V11_${IP11}_${PT11}
-    - CF_V12_${IP12}_${PT12}
-    - CF_V13_${IP13}_${PT13}
-    - CF_V14_${IP14}_${PT14}
-    - CF_V15_${IP15}_${PT15}
-    - CF_V16_${IP16}_${PT16}
-    - CF_V17_${IP17}_${PT17}
-    - CF_V18_${IP18}_${PT18}
-    - CF_V19_${IP19}_${PT19}
-    - CF_V20_${IP20}_${PT20}
-    - CF_V21_${IP21}_${PT21}
-    - CF_V22_${IP22}_${PT22}
-    - CF_V23_${IP23}_${PT23}
-    - CF_V24_${IP24}_${PT24}
-    - CF_V25_${IP25}_${PT25}
-    - CF_V26_${IP26}_${PT26}
-    - CF_V27_${IP27}_${PT27}
-    - CF_V28_${IP28}_${PT28}
-    - CF_V29_${IP29}_${PT29}
-    - CF_V30_${IP30}_${PT30}
-    - CF_V31_${IP31}_${PT31}
-    - CF_V32_${IP32}_${PT32}
-    - CF_V33_${IP33}_${PT33}
-    - CF_V34_${IP34}_${PT34}
-    - CF_V35_${IP35}_${PT35}
-    - CF_V36_${IP36}_${PT36}
-    - CF_V37_${IP37}_${PT37}
-    - CF_V38_${IP38}_${PT38}
-    - CF_V39_${IP39}_${PT39}
-    - CF_V40_${IP40}_${PT40}
-    - CF_V41_${IP41}_${PT41}
-    - CF_V42_${IP42}_${PT42}
-    - CF_V43_${IP43}_${PT43}
-    - CF_V44_${IP44}_${PT44}
-    - CF_V45_${IP45}_${PT45}
-    - CF_V46_${IP46}_${PT46}
-    - CF_V47_${IP47}_${PT47}
-    - CF_V48_${IP48}_${PT48}
-    - CF_V49_${IP49}_${PT49}
-    - CF_V50_${IP50}_${PT50}
+    - CF_T26_${IP26}_${PT26}
+    - CF_T27_${IP27}_${PT27}
+    - CF_T28_${IP28}_${PT28}
+    - CF_T29_${IP29}_${PT29}
+    - CF_T30_${IP30}_${PT30}
+    - CF_T31_${IP31}_${PT31}
+    - CF_T32_${IP32}_${PT32}
+    - CF_T33_${IP33}_${PT33}
+    - CF_T34_${IP34}_${PT34}
+    - CF_T35_${IP35}_${PT35}
+    - CF_T36_${IP36}_${PT36}
+    - CF_T37_${IP37}_${PT37}
+    - CF_T38_${IP38}_${PT38}
+    - CF_T39_${IP39}_${PT39}
+    - CF_T40_${IP40}_${PT40}
+    - CF_T41_${IP41}_${PT41}
+    - CF_T42_${IP42}_${PT42}
+    - CF_T43_${IP43}_${PT43}
+    - CF_T44_${IP44}_${PT44}
+    - CF_T45_${IP45}_${PT45}
+    - CF_T46_${IP46}_${PT46}
+    - CF_T47_${IP47}_${PT47}
+    - CF_T48_${IP48}_${PT48}
+    - CF_T49_${IP49}_${PT49}
+    - CF_T50_${IP50}_${PT50}
 
 - name: 🌍选择代理
   type: select
@@ -2107,56 +1416,31 @@ proxy-groups:
     - 负载均衡
     - 自动选择
     - DIRECT
-    - CF_V1_${IP1}_${PT1}
-    - CF_V2_${IP2}_${PT2}
-    - CF_V3_${IP3}_${PT3}
-    - CF_V4_${IP4}_${PT4}
-    - CF_V5_${IP5}_${PT5}
-    - CF_V6_${IP6}_${PT6}
-    - CF_V7_${IP7}_${PT7}
-    - CF_V8_${IP8}_${PT8}
-    - CF_V9_${IP9}_${PT9}
-    - CF_V10_${IP10}_${PT10}
-    - CF_V11_${IP11}_${PT11}
-    - CF_V12_${IP12}_${PT12}
-    - CF_V13_${IP13}_${PT13}
-    - CF_V14_${IP14}_${PT14}
-    - CF_V15_${IP15}_${PT15}
-    - CF_V16_${IP16}_${PT16}
-    - CF_V17_${IP17}_${PT17}
-    - CF_V18_${IP18}_${PT18}
-    - CF_V19_${IP19}_${PT19}
-    - CF_V20_${IP20}_${PT20}
-    - CF_V21_${IP21}_${PT21}
-    - CF_V22_${IP22}_${PT22}
-    - CF_V23_${IP23}_${PT23}
-    - CF_V24_${IP24}_${PT24}
-    - CF_V25_${IP25}_${PT25}
-    - CF_V26_${IP26}_${PT26}
-    - CF_V27_${IP27}_${PT27}
-    - CF_V28_${IP28}_${PT28}
-    - CF_V29_${IP29}_${PT29}
-    - CF_V30_${IP30}_${PT30}
-    - CF_V31_${IP31}_${PT31}
-    - CF_V32_${IP32}_${PT32}
-    - CF_V33_${IP33}_${PT33}
-    - CF_V34_${IP34}_${PT34}
-    - CF_V35_${IP35}_${PT35}
-    - CF_V36_${IP36}_${PT36}
-    - CF_V37_${IP37}_${PT37}
-    - CF_V38_${IP38}_${PT38}
-    - CF_V39_${IP39}_${PT39}
-    - CF_V40_${IP40}_${PT40}
-    - CF_V41_${IP41}_${PT41}
-    - CF_V42_${IP42}_${PT42}
-    - CF_V43_${IP43}_${PT43}
-    - CF_V44_${IP44}_${PT44}
-    - CF_V45_${IP45}_${PT45}
-    - CF_V46_${IP46}_${PT46}
-    - CF_V47_${IP47}_${PT47}
-    - CF_V48_${IP48}_${PT48}
-    - CF_V49_${IP49}_${PT49}
-    - CF_V50_${IP50}_${PT50}
+    - CF_T26_${IP26}_${PT26}
+    - CF_T27_${IP27}_${PT27}
+    - CF_T28_${IP28}_${PT28}
+    - CF_T29_${IP29}_${PT29}
+    - CF_T30_${IP30}_${PT30}
+    - CF_T31_${IP31}_${PT31}
+    - CF_T32_${IP32}_${PT32}
+    - CF_T33_${IP33}_${PT33}
+    - CF_T34_${IP34}_${PT34}
+    - CF_T35_${IP35}_${PT35}
+    - CF_T36_${IP36}_${PT36}
+    - CF_T37_${IP37}_${PT37}
+    - CF_T38_${IP38}_${PT38}
+    - CF_T39_${IP39}_${PT39}
+    - CF_T40_${IP40}_${PT40}
+    - CF_T41_${IP41}_${PT41}
+    - CF_T42_${IP42}_${PT42}
+    - CF_T43_${IP43}_${PT43}
+    - CF_T44_${IP44}_${PT44}
+    - CF_T45_${IP45}_${PT45}
+    - CF_T46_${IP46}_${PT46}
+    - CF_T47_${IP47}_${PT47}
+    - CF_T48_${IP48}_${PT48}
+    - CF_T49_${IP49}_${PT49}
+    - CF_T50_${IP50}_${PT50}
 
 rules:
   - GEOIP,LAN,DIRECT
@@ -2164,7 +1448,7 @@ rules:
   - MATCH,🌍选择代理`
 }
 	
-function getsbConfig(userID, hostName) {
+function getsbConfig(Pswd, hostName) {
 return `{
 	  "log": {
 		"disabled": false,
@@ -2258,1198 +1542,1148 @@ return `{
 		}
 	  ],
 	  "outbounds": [
-		{
-		  "tag": "select",
-		  "type": "selector",
-		  "default": "auto",
-		  "outbounds": [
-			"auto",
-        "CF_V1_${IP1}_${PT1}",
-        "CF_V2_${IP2}_${PT2}",
-        "CF_V3_${IP3}_${PT3}",
-        "CF_V4_${IP4}_${PT4}",
-        "CF_V5_${IP5}_${PT5}",
-        "CF_V6_${IP6}_${PT6}",
-        "CF_V7_${IP7}_${PT7}",
-        "CF_V8_${IP8}_${PT8}",
-        "CF_V9_${IP9}_${PT9}",
-        "CF_V10_${IP10}_${PT10}",
-        "CF_V11_${IP11}_${PT11}",
-        "CF_V12_${IP12}_${PT12}",
-        "CF_V13_${IP13}_${PT13}",
-        "CF_V14_${IP14}_${PT14}",
-        "CF_V15_${IP15}_${PT15}",
-        "CF_V16_${IP16}_${PT16}",
-        "CF_V17_${IP17}_${PT17}",
-        "CF_V18_${IP18}_${PT18}",
-        "CF_V19_${IP19}_${PT19}",
-        "CF_V20_${IP20}_${PT20}",
-        "CF_V21_${IP21}_${PT21}",
-        "CF_V22_${IP22}_${PT22}",
-        "CF_V23_${IP23}_${PT23}",
-        "CF_V24_${IP24}_${PT24}",
-        "CF_V25_${IP25}_${PT25}",
-        "CF_V26_${IP26}_${PT26}",
-        "CF_V27_${IP27}_${PT27}",
-        "CF_V28_${IP28}_${PT28}",
-        "CF_V29_${IP29}_${PT29}",
-        "CF_V30_${IP30}_${PT30}",
-        "CF_V31_${IP31}_${PT31}",
-        "CF_V32_${IP32}_${PT32}",
-        "CF_V33_${IP33}_${PT33}",
-        "CF_V34_${IP34}_${PT34}",
-        "CF_V35_${IP35}_${PT35}",
-        "CF_V36_${IP36}_${PT36}",
-        "CF_V37_${IP37}_${PT37}",
-        "CF_V38_${IP38}_${PT38}",
-        "CF_V39_${IP39}_${PT39}",
-        "CF_V40_${IP40}_${PT40}",
-        "CF_V41_${IP41}_${PT41}",
-        "CF_V42_${IP42}_${PT42}",
-        "CF_V43_${IP43}_${PT43}",
-        "CF_V44_${IP44}_${PT44}",
-        "CF_V45_${IP45}_${PT45}",
-        "CF_V46_${IP46}_${PT46}",
-        "CF_V47_${IP47}_${PT47}",
-        "CF_V48_${IP48}_${PT48}",
-        "CF_V49_${IP49}_${PT49}",
-        "CF_V50_${IP50}_${PT50}"
-		  ]
-		},
-		{
-          "server": "${IP1}",
-          "server_port": ${PT1},
-          "tag": "CF_V1_${IP1}_${PT1}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP2}",
-          "server_port": ${PT2},
-          "tag": "CF_V2_${IP2}_${PT2}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        }, 
-		       {
-          "server": "${IP3}",
-          "server_port": ${PT3},
-          "tag": "CF_V3_${IP3}_${PT3}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        }, 
-		       {
-          "server": "${IP4}",
-          "server_port": ${PT4},
-          "tag": "CF_V4_${IP4}_${PT4}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP5}",
-          "server_port": ${PT5},
-          "tag": "CF_V5_${IP5}_${PT5}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },  
-		      {
-          "server": "${IP6}",
-          "server_port": ${PT6},
-          "tag": "CF_V6_${IP6}_${PT6}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP7}",
-          "server_port": ${PT7},
-          "tag": "CF_V7_${IP7}_${PT7}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP8}",
-          "server_port": ${PT8},
-          "tag": "CF_V8_${IP8}_${PT8}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP9}",
-          "server_port": ${PT9},
-          "tag": "CF_V9_${IP9}_${PT9}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP10}",
-          "server_port": ${PT10},
-          "tag": "CF_V10_${IP10}_${PT10}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP11}",
-          "server_port": ${PT11},
-          "tag": "CF_V11_${IP11}_${PT11}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP12}",
-          "server_port": ${PT12},
-          "tag": "CF_V12_${IP12}_${PT12}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP13}",
-          "server_port": ${PT13},
-          "tag": "CF_V13_${IP13}_${PT13}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP14}",
-          "server_port": ${PT14},
-          "tag": "CF_V14_${IP14}_${PT14}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP15}",
-          "server_port": ${PT15},
-          "tag": "CF_V15_${IP15}_${PT15}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP16}",
-          "server_port": ${PT16},
-          "tag": "CF_V16_${IP16}_${PT16}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP17}",
-          "server_port": ${PT17},
-          "tag": "CF_V17_${IP17}_${PT17}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP18}",
-          "server_port": ${PT18},
-          "tag": "CF_V18_${IP18}_${PT18}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP19}",
-          "server_port": ${PT19},
-          "tag": "CF_V19_${IP19}_${PT19}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP20}",
-          "server_port": ${PT20},
-          "tag": "CF_V20_${IP20}_${PT20}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP21}",
-          "server_port": ${PT21},
-          "tag": "CF_V21_${IP21}_${PT21}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP22}",
-          "server_port": ${PT22},
-          "tag": "CF_V22_${IP22}_${PT22}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP23}",
-          "server_port": ${PT23},
-          "tag": "CF_V23_${IP23}_${PT23}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP24}",
-          "server_port": ${PT24},
-          "tag": "CF_V24_${IP24}_${PT24}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		        {
-          "server": "${IP25}",
-          "server_port": ${PT25},
-          "tag": "CF_V25_${IP25}_${PT25}",
-          "packet_encoding": "packetaddr",
-          "transport": {
-            "headers": {
-              "Host": [
-                "${hostName}"
-              ]
-            },
-            "path": "/?ed=2560",
-            "type": "ws"
-          },
-          "type": "vless",
-          "uuid": "${userID}"
-        },
-		{     
-		  "server": "${IP26}",
-		  "server_port": ${PT26},
-		  "tag": "CF_V26_${IP26}_${PT26}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-		{
-		  "server": "${IP27}",
-		  "server_port": ${PT27},
-		  "tag": "CF_V27_${IP27}_${PT27}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-		{
-		  "server": "${IP28}",
-		  "server_port": ${PT28},
-		  "tag": "CF_V28_${IP28}_${PT28}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-		{
-		  "server": "${IP29}",
-		  "server_port": ${PT29},
-		  "tag": "CF_V29_${IP29}_${PT29}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-		{
-		  "server": "${IP30}",
-		  "server_port": ${PT30},
-		  "tag": "CF_V30_${IP30}_${PT30}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-		{
-		  "server": "${IP31}",
-		  "server_port": ${PT31},
-		  "tag": "CF_V31_${IP31}_${PT31}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP32}",
-		  "server_port": ${PT32},
-		  "tag": "CF_V32_${IP32}_${PT32}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP33}",
-		  "server_port": ${PT33},
-		  "tag": "CF_V33_${IP33}_${PT33}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP34}",
-		  "server_port": ${PT34},
-		  "tag": "CF_V34_${IP34}_${PT34}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP35}",
-		  "server_port": ${PT35},
-		  "tag": "CF_V35_${IP35}_${PT35}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP36}",
-		  "server_port": ${PT36},
-		  "tag": "CF_V36_${IP36}_${PT36}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP37}",
-		  "server_port": ${PT37},
-		  "tag": "CF_V37_${IP37}_${PT37}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP38}",
-		  "server_port": ${PT38},
-		  "tag": "CF_V38_${IP38}_${PT38}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP39}",
-		  "server_port": ${PT39},
-		  "tag": "CF_V39_${IP39}_${PT39}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP40}",
-		  "server_port": ${PT40},
-		  "tag": "CF_V40_${IP40}_${PT40}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP41}",
-		  "server_port": ${PT41},
-		  "tag": "CF_V41_${IP41}_${PT41}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP42}",
-		  "server_port": ${PT42},
-		  "tag": "CF_V42_${IP42}_${PT42}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP43}",
-		  "server_port": ${PT43},
-		  "tag": "CF_V43_${IP43}_${PT43}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP44}",
-		  "server_port": ${PT44},
-		  "tag": "CF_V44_${IP44}_${PT44}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP45}",
-		  "server_port": ${PT45},
-		  "tag": "CF_V45_${IP45}_${PT45}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP46}",
-		  "server_port": ${PT46},
-		  "tag": "CF_V46_${IP46}_${PT46}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP47}",
-		  "server_port": ${PT47},
-		  "tag": "CF_V47_${IP47}_${PT47}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP48}",
-		  "server_port": ${PT48},
-		  "tag": "CF_V48_${IP48}_${PT48}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP49}",
-		  "server_port": ${PT49},
-		  "tag": "CF_V49_${IP49}_${PT49}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-				{
-		  "server": "${IP50}",
-		  "server_port": ${PT50},
-		  "tag": "CF_V50_${IP50}_${PT50}",
-		  "tls": {
-			"enabled": true,
-			"server_name": "${hostName}",
-			"insecure": false,
-			"utls": {
-			  "enabled": true,
-			  "fingerprint": "chrome"
-			}
-		  },
-		  "packet_encoding": "packetaddr",
-		  "transport": {
-			"headers": {
-			  "Host": [
-				"${hostName}"
-			  ]
-			},
-			"path": "/?ed=2560",
-			"type": "ws"
-		  },
-		  "type": "vless",
-		  "uuid": "${userID}"
-		},
-		{
-		  "tag": "direct",
-		  "type": "direct"
-		},
-		{
-		  "tag": "auto",
-		  "type": "urltest",
-		  "outbounds": [
-        "CF_V1_${IP1}_${PT1}",
-        "CF_V2_${IP2}_${PT2}",
-        "CF_V3_${IP3}_${PT3}",
-        "CF_V4_${IP4}_${PT4}",
-        "CF_V5_${IP5}_${PT5}",
-        "CF_V6_${IP6}_${PT6}",
-        "CF_V7_${IP7}_${PT7}",
-        "CF_V8_${IP8}_${PT8}",
-        "CF_V9_${IP9}_${PT9}",
-        "CF_V10_${IP10}_${PT10}",
-        "CF_V11_${IP11}_${PT11}",
-        "CF_V12_${IP12}_${PT12}",
-        "CF_V13_${IP13}_${PT13}",
-        "CF_V14_${IP14}_${PT14}",
-        "CF_V15_${IP15}_${PT15}",
-        "CF_V16_${IP16}_${PT16}",
-        "CF_V17_${IP17}_${PT17}",
-        "CF_V18_${IP18}_${PT18}",
-        "CF_V19_${IP19}_${PT19}",
-        "CF_V20_${IP20}_${PT20}",
-        "CF_V21_${IP21}_${PT21}",
-        "CF_V22_${IP22}_${PT22}",
-        "CF_V23_${IP23}_${PT23}",
-        "CF_V24_${IP24}_${PT24}",
-        "CF_V25_${IP25}_${PT25}",
-        "CF_V26_${IP26}_${PT26}",
-        "CF_V27_${IP27}_${PT27}",
-        "CF_V28_${IP28}_${PT28}",
-        "CF_V29_${IP29}_${PT29}",
-        "CF_V30_${IP30}_${PT30}",
-        "CF_V31_${IP31}_${PT31}",
-        "CF_V32_${IP32}_${PT32}",
-        "CF_V33_${IP33}_${PT33}",
-        "CF_V34_${IP34}_${PT34}",
-        "CF_V35_${IP35}_${PT35}",
-        "CF_V36_${IP36}_${PT36}",
-        "CF_V37_${IP37}_${PT37}",
-        "CF_V38_${IP38}_${PT38}",
-        "CF_V39_${IP39}_${PT39}",
-        "CF_V40_${IP40}_${PT40}",
-        "CF_V41_${IP41}_${PT41}",
-        "CF_V42_${IP42}_${PT42}",
-        "CF_V43_${IP43}_${PT43}",
-        "CF_V44_${IP44}_${PT44}",
-        "CF_V45_${IP45}_${PT45}",
-        "CF_V46_${IP46}_${PT46}",
-        "CF_V47_${IP47}_${PT47}",
-        "CF_V48_${IP48}_${PT48}",
-        "CF_V49_${IP49}_${PT49}",
-        "CF_V50_${IP50}_${PT50}"
-		  ],
+      {
+        "tag": "select",
+        "type": "selector",
+        "default": "auto",
+        "outbounds": [
+        "auto",
+        "CF_T1_${IP1}_${PT1}",
+        "CF_T2_${IP2}_${PT2}",
+        "CF_T3_${IP3}_${PT3}",
+        "CF_T4_${IP4}_${PT4}",
+        "CF_T5_${IP5}_${PT5}",
+        "CF_T6_${IP6}_${PT6}",
+        "CF_T7_${IP7}_${PT7}",
+        "CF_T8_${IP8}_${PT8}",
+        "CF_T9_${IP9}_${PT9}",
+        "CF_T10_${IP10}_${PT10}",
+        "CF_T11_${IP11}_${PT11}",
+        "CF_T12_${IP12}_${PT12}",
+        "CF_T13_${IP13}_${PT13}",
+        "CF_T14_${IP14}_${PT14}",
+        "CF_T15_${IP15}_${PT15}",
+        "CF_T16_${IP16}_${PT16}",
+        "CF_T17_${IP17}_${PT17}",
+        "CF_T18_${IP18}_${PT18}",
+        "CF_T19_${IP19}_${PT19}",
+        "CF_T20_${IP20}_${PT20}",
+        "CF_T21_${IP21}_${PT21}",
+        "CF_T22_${IP22}_${PT22}",
+        "CF_T23_${IP23}_${PT23}",
+        "CF_T24_${IP24}_${PT24}",
+        "CF_T25_${IP25}_${PT25}",
+        "CF_T26_${IP26}_${PT26}",
+        "CF_T27_${IP27}_${PT27}",
+        "CF_T28_${IP28}_${PT28}",
+        "CF_T29_${IP29}_${PT29}",
+        "CF_T30_${IP30}_${PT30}",
+        "CF_T31_${IP31}_${PT31}",
+        "CF_T32_${IP32}_${PT32}",
+        "CF_T33_${IP33}_${PT33}",
+        "CF_T34_${IP34}_${PT34}",
+        "CF_T35_${IP35}_${PT35}",
+        "CF_T36_${IP36}_${PT36}",
+        "CF_T37_${IP37}_${PT37}",
+        "CF_T38_${IP38}_${PT38}",
+        "CF_T39_${IP39}_${PT39}",
+        "CF_T40_${IP40}_${PT40}",
+        "CF_T41_${IP41}_${PT41}",
+        "CF_T42_${IP42}_${PT42}",
+        "CF_T43_${IP43}_${PT43}",
+        "CF_T44_${IP44}_${PT44}",
+        "CF_T45_${IP45}_${PT45}",
+        "CF_T46_${IP46}_${PT46}",
+        "CF_T47_${IP47}_${PT47}",
+        "CF_T48_${IP48}_${PT48}",
+        "CF_T49_${IP49}_${PT49}",
+        "CF_T50_${IP50}_${PT50}"
+        ]
+      },
+      {
+    "server": "${IP1}",
+    "server_port": ${PT1},
+    "tag": "CF_T1_${IP1}_${PT1}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP2}",
+    "server_port": ${PT2},
+    "tag": "CF_T2_${IP2}_${PT2}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP3}",
+    "server_port": ${PT3},
+    "tag": "CF_T3_${IP3}_${PT3}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP4}",
+    "server_port": ${PT4},
+    "tag": "CF_T4_${IP4}_${PT4}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP5}",
+    "server_port": ${PT5},
+    "tag": "CF_T5_${IP5}_${PT5}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP6}",
+    "server_port": ${PT6},
+    "tag": "CF_T6_${IP6}_${PT6}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP7}",
+    "server_port": ${PT7},
+    "tag": "CF_T7_${IP7}_${PT7}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP8}",
+    "server_port": ${PT8},
+    "tag": "CF_T8_${IP8}_${PT8}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP9}",
+    "server_port": ${PT9},
+    "tag": "CF_T9_${IP9}_${PT9}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP10}",
+    "server_port": ${PT10},
+    "tag": "CF_T10_${IP10}_${PT10}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP11}",
+    "server_port": ${PT11},
+    "tag": "CF_T11_${IP11}_${PT11}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP12}",
+    "server_port": ${PT12},
+    "tag": "CF_T12_${IP12}_${PT12}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP13}",
+    "server_port": ${PT13},
+    "tag": "CF_T13_${IP13}_${PT13}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP14}",
+    "server_port": ${PT14},
+    "tag": "CF_T14_${IP14}_${PT14}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP15}",
+    "server_port": ${PT15},
+    "tag": "CF_T15_${IP15}_${PT15}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP16}",
+    "server_port": ${PT16},
+    "tag": "CF_T16_${IP16}_${PT16}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP17}",
+    "server_port": ${PT17},
+    "tag": "CF_T17_${IP17}_${PT17}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP18}",
+    "server_port": ${PT18},
+    "tag": "CF_T18_${IP18}_${PT18}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP19}",
+    "server_port": ${PT19},
+    "tag": "CF_T19_${IP19}_${PT19}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP20}",
+    "server_port": ${PT20},
+    "tag": "CF_T20_${IP20}_${PT20}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP21}",
+    "server_port": ${PT21},
+    "tag": "CF_T21_${IP21}_${PT21}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP22}",
+    "server_port": ${PT22},
+    "tag": "CF_T22_${IP22}_${PT22}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP23}",
+    "server_port": ${PT23},
+    "tag": "CF_T23_${IP23}_${PT23}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP24}",
+    "server_port": ${PT24},
+    "tag": "CF_T24_${IP24}_${PT24}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+  {
+    "server": "${IP25}",
+    "server_port": ${PT25},
+    "tag": "CF_T25_${IP25}_${PT25}",
+    "transport": {
+      "headers": {
+        "Host": [
+          "${hostName}"
+        ]
+      },
+      "path": "/?ed=2560",
+      "type": "ws"
+    },
+    "type": "trojan",
+    "password": "${Pswd}"
+  },
+{
+  "server": "${IP26}",
+  "server_port": ${PT26},
+  "tag": "CF_T26_${IP26}_${PT26}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP27}",
+  "server_port": ${PT27},
+  "tag": "CF_T27_${IP27}_${PT27}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP28}",
+  "server_port": ${PT28},
+  "tag": "CF_T28_${IP28}_${PT28}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP29}",
+  "server_port": ${PT29},
+  "tag": "CF_T29_${IP29}_${PT29}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP30}",
+  "server_port": ${PT30},
+  "tag": "CF_T30_${IP30}_${PT30}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP31}",
+  "server_port": ${PT31},
+  "tag": "CF_T31_${IP31}_${PT31}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP32}",
+  "server_port": ${PT32},
+  "tag": "CF_T32_${IP32}_${PT32}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP33}",
+  "server_port": ${PT33},
+  "tag": "CF_T33_${IP33}_${PT33}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP34}",
+  "server_port": ${PT34},
+  "tag": "CF_T34_${IP34}_${PT34}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP35}",
+  "server_port": ${PT35},
+  "tag": "CF_T35_${IP35}_${PT35}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP36}",
+  "server_port": ${PT36},
+  "tag": "CF_T36_${IP36}_${PT36}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP37}",
+  "server_port": ${PT37},
+  "tag": "CF_T37_${IP37}_${PT37}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP38}",
+  "server_port": ${PT38},
+  "tag": "CF_T38_${IP38}_${PT38}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP39}",
+  "server_port": ${PT39},
+  "tag": "CF_T39_${IP39}_${PT39}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP40}",
+  "server_port": ${PT40},
+  "tag": "CF_T40_${IP40}_${PT40}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP41}",
+  "server_port": ${PT41},
+  "tag": "CF_T41_${IP41}_${PT41}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP42}",
+  "server_port": ${PT42},
+  "tag": "CF_T42_${IP42}_${PT42}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP43}",
+  "server_port": ${PT43},
+  "tag": "CF_T43_${IP43}_${PT43}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP44}",
+  "server_port": ${PT44},
+  "tag": "CF_T44_${IP44}_${PT44}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP45}",
+  "server_port": ${PT45},
+  "tag": "CF_T45_${IP45}_${PT45}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP46}",
+  "server_port": ${PT46},
+  "tag": "CF_T46_${IP46}_${PT46}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP47}",
+  "server_port": ${PT47},
+  "tag": "CF_T47_${IP47}_${PT47}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP48}",
+  "server_port": ${PT48},
+  "tag": "CF_T48_${IP48}_${PT48}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP49}",
+  "server_port": ${PT49},
+  "tag": "CF_T49_${IP49}_${PT49}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP50}",
+  "server_port": ${PT50},
+  "tag": "CF_T50_${IP50}_${PT50}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+      {
+        "tag": "direct",
+        "type": "direct"
+      },
+      {
+        "tag": "auto",
+        "type": "urltest",
+        "outbounds": [
+         "CF_T1_${IP1}_${PT1}",
+        "CF_T2_${IP2}_${PT2}",
+        "CF_T3_${IP3}_${PT3}",
+        "CF_T4_${IP4}_${PT4}",
+        "CF_T5_${IP5}_${PT5}",
+        "CF_T6_${IP6}_${PT6}",
+        "CF_T7_${IP7}_${PT7}",
+        "CF_T8_${IP8}_${PT8}",
+        "CF_T9_${IP9}_${PT9}",
+        "CF_T10_${IP10}_${PT10}",
+        "CF_T11_${IP11}_${PT11}",
+        "CF_T12_${IP12}_${PT12}",
+        "CF_T13_${IP13}_${PT13}",
+        "CF_T14_${IP14}_${PT14}",
+        "CF_T15_${IP15}_${PT15}",
+        "CF_T16_${IP16}_${PT16}",
+        "CF_T17_${IP17}_${PT17}",
+        "CF_T18_${IP18}_${PT18}",
+        "CF_T19_${IP19}_${PT19}",
+        "CF_T20_${IP20}_${PT20}",
+        "CF_T21_${IP21}_${PT21}",
+        "CF_T22_${IP22}_${PT22}",
+        "CF_T23_${IP23}_${PT23}",
+        "CF_T24_${IP24}_${PT24}",
+        "CF_T25_${IP25}_${PT25}",
+        "CF_T26_${IP26}_${PT26}",
+        "CF_T27_${IP27}_${PT27}",
+        "CF_T28_${IP28}_${PT28}",
+        "CF_T29_${IP29}_${PT29}",
+        "CF_T30_${IP30}_${PT30}",
+        "CF_T31_${IP31}_${PT31}",
+        "CF_T32_${IP32}_${PT32}",
+        "CF_T33_${IP33}_${PT33}",
+        "CF_T34_${IP34}_${PT34}",
+        "CF_T35_${IP35}_${PT35}",
+        "CF_T36_${IP36}_${PT36}",
+        "CF_T37_${IP37}_${PT37}",
+        "CF_T38_${IP38}_${PT38}",
+        "CF_T39_${IP39}_${PT39}",
+        "CF_T40_${IP40}_${PT40}",
+        "CF_T41_${IP41}_${PT41}",
+        "CF_T42_${IP42}_${PT42}",
+        "CF_T43_${IP43}_${PT43}",
+        "CF_T44_${IP44}_${PT44}",
+        "CF_T45_${IP45}_${PT45}",
+        "CF_T46_${IP46}_${PT46}",
+        "CF_T47_${IP47}_${PT47}",
+        "CF_T48_${IP48}_${PT48}",
+        "CF_T49_${IP49}_${PT49}",
+        "CF_T50_${IP50}_${PT50}"
+        ],
 		  "url": "https://www.gstatic.com/generate_204",
 		  "interval": "1m",
 		  "tolerance": 50,
@@ -3486,19 +2720,19 @@ return `{
 		"auto_detect_interface": true,
 		"final": "select",
 		"rules": [
-                         {
-                        "inbound": "tun-in",
-                        "action": "sniff"
-                         },
-                          {
-                        "protocol": "dns",
-                           "action": "hijack-dns"
-                         },
-                        {
-                        "port": 443,
-                        "network": "udp",
-                        "action": "reject"
-                         },
+                     {
+                     "inbound": "tun-in",
+                     "action": "sniff"
+                     },
+                      {
+                    "protocol": "dns",
+                    "action": "hijack-dns"
+                     },
+                      {
+                    "port": 443,
+                    "network": "udp",
+                    "action": "reject"
+                    },
 		  {
 			"clash_mode": "Direct",
 			"outbound": "direct"
@@ -3535,12 +2769,12 @@ return `{
 	}`
 }
 
-function getptyConfig(userID, hostName) {
-	const vlessshare = btoa(`vless\u003A//${userID}\u0040${IP26}:${PT26}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V26_${IP26}_${PT26}\nvless\u003A//${userID}\u0040${IP27}:${PT27}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V27_${IP27}_${PT27}\nvless\u003A//${userID}\u0040${IP28}:${PT28}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V28_${IP28}_${PT28}\nvless\u003A//${userID}\u0040${IP29}:${PT29}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V29_${IP29}_${PT29}\nvless\u003A//${userID}\u0040${IP30}:${PT30}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V30_${IP30}_${PT30}\nvless\u003A//${userID}\u0040${IP31}:${PT31}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V31_${IP31}_${PT31}\nvless\u003A//${userID}\u0040${IP32}:${PT32}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V32_${IP32}_${PT32}\nvless\u003A//${userID}\u0040${IP33}:${PT33}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V33_${IP33}_${PT33}\nvless\u003A//${userID}\u0040${IP34}:${PT34}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V34_${IP34}_${PT34}\nvless\u003A//${userID}\u0040${IP35}:${PT35}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V35_${IP35}_${PT35}\nvless\u003A//${userID}\u0040${IP36}:${PT36}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V36_${IP36}_${PT36}\nvless\u003A//${userID}\u0040${IP37}:${PT37}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V37_${IP37}_${PT37}\nvless\u003A//${userID}\u0040${IP38}:${PT38}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V38_${IP38}_${PT38}\nvless\u003A//${userID}\u0040${IP39}:${PT39}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V39_${IP39}_${PT39}\nvless\u003A//${userID}\u0040${IP40}:${PT40}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V40_${IP40}_${PT40}\nvless\u003A//${userID}\u0040${IP41}:${PT41}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V41_${IP41}_${PT41}\nvless\u003A//${userID}\u0040${IP42}:${PT42}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V42_${IP42}_${PT42}\nvless\u003A//${userID}\u0040${IP43}:${PT43}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V43_${IP43}_${PT43}\nvless\u003A//${userID}\u0040${IP44}:${PT44}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V44_${IP44}_${PT44}\nvless\u003A//${userID}\u0040${IP45}:${PT45}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V45_${IP45}_${PT45}\nvless\u003A//${userID}\u0040${IP46}:${PT46}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V46_${IP46}_${PT46}\nvless\u003A//${userID}\u0040${IP47}:${PT47}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V47_${IP47}_${PT47}\nvless\u003A//${userID}\u0040${IP48}:${PT48}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V48_${IP48}_${PT48}\nvless\u003A//${userID}\u0040${IP49}:${PT49}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V49_${IP49}_${PT49}\nvless\u003A//${userID}\u0040${IP50}:${PT50}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_V50_${IP50}_${PT50}`);	
-		return `${vlessshare}`
-	}
+function getptyConfig(Pswd, hostName) {
+  const trojanshare = btoa(`trojan://${Pswd}\u0040${IP26}:${PT26}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T26_${IP26}_${PT26}\ntrojan://${Pswd}\u0040${IP27}:${PT27}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T27_${IP27}_${PT27}\ntrojan://${Pswd}\u0040${IP28}:${PT28}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T28_${IP28}_${PT28}\ntrojan://${Pswd}\u0040${IP29}:${PT29}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T29_${IP29}_${PT29}\ntrojan://${Pswd}\u0040${IP30}:${PT30}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T30_${IP30}_${PT30}\ntrojan://${Pswd}\u0040${IP31}:${PT31}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T31_${IP31}_${PT31}\ntrojan://${Pswd}\u0040${IP32}:${PT32}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T32_${IP32}_${PT32}\ntrojan://${Pswd}\u0040${IP33}:${PT33}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T33_${IP33}_${PT33}\ntrojan://${Pswd}\u0040${IP34}:${PT34}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T34_${IP34}_${PT34}\ntrojan://${Pswd}\u0040${IP35}:${PT35}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T35_${IP35}_${PT35}\ntrojan://${Pswd}\u0040${IP36}:${PT36}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T36_${IP36}_${PT36}\ntrojan://${Pswd}\u0040${IP37}:${PT37}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T37_${IP37}_${PT37}\ntrojan://${Pswd}\u0040${IP38}:${PT38}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T38_${IP38}_${PT38}\ntrojan://${Pswd}\u0040${IP39}:${PT39}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T39_${IP39}_${PT39}\ntrojan://${Pswd}\u0040${IP40}:${PT40}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T40_${IP40}_${PT40}\ntrojan://${Pswd}\u0040${IP41}:${PT41}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T41_${IP41}_${PT41}\ntrojan://${Pswd}\u0040${IP42}:${PT42}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T42_${IP42}_${PT42}\ntrojan://${Pswd}\u0040${IP43}:${PT43}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T43_${IP43}_${PT43}\ntrojan://${Pswd}\u0040${IP44}:${PT44}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T44_${IP44}_${PT44}\ntrojan://${Pswd}\u0040${IP45}:${PT45}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T45_${IP45}_${PT45}\ntrojan://${Pswd}\u0040${IP46}:${PT46}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T46_${IP46}_${PT46}\ntrojan://${Pswd}\u0040${IP47}:${PT47}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T47_${IP47}_${PT47}\ntrojan://${Pswd}\u0040${IP48}:${PT48}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T48_${IP48}_${PT48}\ntrojan://${Pswd}\u0040${IP49}:${PT49}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T49_${IP49}_${PT49}\ntrojan://${Pswd}\u0040${IP50}:${PT50}?encryption=none&security=tls&sni=${hostName}&fp=randomized&type=ws&host=${hostName}&path=%2F%3Fed%3D2560#CF_T50_${IP50}_${PT50}`);
+  return `${trojanshare}`
+}
 	
-function getpclConfig(userID, hostName) {
+function getpclConfig(Pswd, hostName) {
 return `
 port: 7890
 allow-lan: true
@@ -3571,351 +2805,326 @@ dns:
       - 240.0.0.0/4
 
 proxies:
-- name: CF_V26_${IP26}_${PT26}
-  type: vless
+- name: CF_T26_${IP26}_${PT26}
+  type: trojan
   server: ${IP26}
   port: ${PT26}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-  servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V27_${IP27}_${PT27}
-  type: vless
+
+- name: CF_T27_${IP27}_${PT27}
+  type: trojan
   server: ${IP27}
   port: ${PT27}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V28_${IP28}_${PT28}
-  type: vless
+
+- name: CF_T28_${IP28}_${PT28}
+  type: trojan
   server: ${IP28}
   port: ${PT28}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V29_${IP29}_${PT29}
-  type: vless
+
+- name: CF_T29_${IP29}_${PT29}
+  type: trojan
   server: ${IP29}
   port: ${PT29}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V30_${IP30}_${PT30}
-  type: vless
+
+- name: CF_T30_${IP30}_${PT30}
+  type: trojan
   server: ${IP30}
   port: ${PT30}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V31_${IP31}_${PT31}
-  type: vless
+
+- name: CF_T31_${IP31}_${PT31}
+  type: trojan
   server: ${IP31}
   port: ${PT31}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V32_${IP32}_${PT32}
-  type: vless
+
+- name: CF_T32_${IP32}_${PT32}
+  type: trojan
   server: ${IP32}
   port: ${PT32}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V33_${IP33}_${PT33}
-  type: vless
+
+- name: CF_T33_${IP33}_${PT33}
+  type: trojan
   server: ${IP33}
   port: ${PT33}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V34_${IP34}_${PT34}
-  type: vless
+
+- name: CF_T34_${IP34}_${PT34}
+  type: trojan
   server: ${IP34}
   port: ${PT34}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V35_${IP35}_${PT35}
-  type: vless
+
+- name: CF_T35_${IP35}_${PT35}
+  type: trojan
   server: ${IP35}
   port: ${PT35}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V36_${IP36}_${PT36}
-  type: vless
+
+- name: CF_T36_${IP36}_${PT36}
+  type: trojan
   server: ${IP36}
   port: ${PT36}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V37_${IP37}_${PT37}
-  type: vless
+
+- name: CF_T37_${IP37}_${PT37}
+  type: trojan
   server: ${IP37}
   port: ${PT37}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V38_${IP38}_${PT38}
-  type: vless
+
+- name: CF_T38_${IP38}_${PT38}
+  type: trojan
   server: ${IP38}
   port: ${PT38}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V39_${IP39}_${PT39}
-  type: vless
+
+- name: CF_T39_${IP39}_${PT39}
+  type: trojan
   server: ${IP39}
   port: ${PT39}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V40_${IP40}_${PT40}
-  type: vless
+
+- name: CF_T40_${IP40}_${PT40}
+  type: trojan
   server: ${IP40}
   port: ${PT40}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
       
-- name: CF_V41_${IP41}_${PT41}
-  type: vless
+- name: CF_T41_${IP41}_${PT41}
+  type: trojan
   server: ${IP41}
   port: ${PT41}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V42_${IP42}_${PT42}
-  type: vless
+
+- name: CF_T42_${IP42}_${PT42}
+  type: trojan
   server: ${IP42}
   port: ${PT42}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V43_${IP43}_${PT43}
-  type: vless
+
+- name: CF_T43_${IP43}_${PT43}
+  type: trojan
   server: ${IP43}
   port: ${PT43}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V44_${IP44}_${PT44}
-  type: vless
+
+- name: CF_T44_${IP44}_${PT44}
+  type: trojan
   server: ${IP44}
   port: ${PT44}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V45_${IP45}_${PT45}
-  type: vless
+
+- name: CF_T45_${IP45}_${PT45}
+  type: trojan
   server: ${IP45}
   port: ${PT45}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V46_${IP46}_${PT46}
-  type: vless
+
+- name: CF_T46_${IP46}_${PT46}
+  type: trojan
   server: ${IP46}
   port: ${PT46}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V47_${IP47}_${PT47}
-  type: vless
+
+- name: CF_T47_${IP47}_${PT47}
+  type: trojan
   server: ${IP47}
   port: ${PT47}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V48_${IP48}_${PT48}
-  type: vless
+
+- name: CF_T48_${IP48}_${PT48}
+  type: trojan
   server: ${IP48}
   port: ${PT48}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V49_${IP49}_${PT49}
-  type: vless
+
+- name: CF_T49_${IP49}_${PT49}
+  type: trojan
   server: ${IP49}
   port: ${PT49}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
       Host: ${hostName}
-      
-- name: CF_V50_${IP50}_${PT50}
-  type: vless
+
+- name: CF_T50_${IP50}_${PT50}
+  type: trojan
   server: ${IP50}
   port: ${PT50}
-  uuid: ${userID}
+  password: ${Pswd}
   udp: false
-  tls: true
+  sni: ${hostName}
   network: ws
-    servername: ${hostName}
   ws-opts:
     path: "/?ed=2560"
     headers:
@@ -3927,31 +3136,31 @@ proxy-groups:
   url: http://www.gstatic.com/generate_204
   interval: 300
   proxies:
-  	- CF_V26_${IP26}_${PT26}
-    - CF_V27_${IP27}_${PT27}
-    - CF_V28_${IP28}_${PT28}
-    - CF_V29_${IP29}_${PT29}
-    - CF_V30_${IP30}_${PT30}
-    - CF_V31_${IP31}_${PT31}
-    - CF_V32_${IP32}_${PT32}
-    - CF_V33_${IP33}_${PT33}
-    - CF_V34_${IP34}_${PT34}
-    - CF_V35_${IP35}_${PT35}
-    - CF_V36_${IP36}_${PT36}
-    - CF_V37_${IP37}_${PT37}
-    - CF_V38_${IP38}_${PT38}
-    - CF_V39_${IP39}_${PT39}
-    - CF_V40_${IP40}_${PT40}
-    - CF_V41_${IP41}_${PT41}
-    - CF_V42_${IP42}_${PT42}
-    - CF_V43_${IP43}_${PT43}
-    - CF_V44_${IP44}_${PT44}
-    - CF_V45_${IP45}_${PT45}
-    - CF_V46_${IP46}_${PT46}
-    - CF_V47_${IP47}_${PT47}
-    - CF_V48_${IP48}_${PT48}
-    - CF_V49_${IP49}_${PT49}
-    - CF_V50_${IP50}_${PT50}
+    - CF_T26_${IP26}_${PT26}
+    - CF_T27_${IP27}_${PT27}
+    - CF_T28_${IP28}_${PT28}
+    - CF_T29_${IP29}_${PT29}
+    - CF_T30_${IP30}_${PT30}
+    - CF_T31_${IP31}_${PT31}
+    - CF_T32_${IP32}_${PT32}
+    - CF_T33_${IP33}_${PT33}
+    - CF_T34_${IP34}_${PT34}
+    - CF_T35_${IP35}_${PT35}
+    - CF_T36_${IP36}_${PT36}
+    - CF_T37_${IP37}_${PT37}
+    - CF_T38_${IP38}_${PT38}
+    - CF_T39_${IP39}_${PT39}
+    - CF_T40_${IP40}_${PT40}
+    - CF_T41_${IP41}_${PT41}
+    - CF_T42_${IP42}_${PT42}
+    - CF_T43_${IP43}_${PT43}
+    - CF_T44_${IP44}_${PT44}
+    - CF_T45_${IP45}_${PT45}
+    - CF_T46_${IP46}_${PT46}
+    - CF_T47_${IP47}_${PT47}
+    - CF_T48_${IP48}_${PT48}
+    - CF_T49_${IP49}_${PT49}
+    - CF_T50_${IP50}_${PT50}
 
 - name: 自动选择
   type: url-test
@@ -3959,31 +3168,31 @@ proxy-groups:
   interval: 300
   tolerance: 50
   proxies:
-  	- CF_V26_${IP26}_${PT26}
-    - CF_V27_${IP27}_${PT27}
-    - CF_V28_${IP28}_${PT28}
-    - CF_V29_${IP29}_${PT29}
-    - CF_V30_${IP30}_${PT30}
-    - CF_V31_${IP31}_${PT31}
-    - CF_V32_${IP32}_${PT32}
-    - CF_V33_${IP33}_${PT33}
-    - CF_V34_${IP34}_${PT34}
-    - CF_V35_${IP35}_${PT35}
-    - CF_V36_${IP36}_${PT36}
-    - CF_V37_${IP37}_${PT37}
-    - CF_V38_${IP38}_${PT38}
-    - CF_V39_${IP39}_${PT39}
-    - CF_V40_${IP40}_${PT40}
-    - CF_V41_${IP41}_${PT41}
-    - CF_V42_${IP42}_${PT42}
-    - CF_V43_${IP43}_${PT43}
-    - CF_V44_${IP44}_${PT44}
-    - CF_V45_${IP45}_${PT45}
-    - CF_V46_${IP46}_${PT46}
-    - CF_V47_${IP47}_${PT47}
-    - CF_V48_${IP48}_${PT48}
-    - CF_V49_${IP49}_${PT49}
-    - CF_V50_${IP50}_${PT50}
+    - CF_T26_${IP26}_${PT26}
+    - CF_T27_${IP27}_${PT27}
+    - CF_T28_${IP28}_${PT28}
+    - CF_T29_${IP29}_${PT29}
+    - CF_T30_${IP30}_${PT30}
+    - CF_T31_${IP31}_${PT31}
+    - CF_T32_${IP32}_${PT32}
+    - CF_T33_${IP33}_${PT33}
+    - CF_T34_${IP34}_${PT34}
+    - CF_T35_${IP35}_${PT35}
+    - CF_T36_${IP36}_${PT36}
+    - CF_T37_${IP37}_${PT37}
+    - CF_T38_${IP38}_${PT38}
+    - CF_T39_${IP39}_${PT39}
+    - CF_T40_${IP40}_${PT40}
+    - CF_T41_${IP41}_${PT41}
+    - CF_T42_${IP42}_${PT42}
+    - CF_T43_${IP43}_${PT43}
+    - CF_T44_${IP44}_${PT44}
+    - CF_T45_${IP45}_${PT45}
+    - CF_T46_${IP46}_${PT46}
+    - CF_T47_${IP47}_${PT47}
+    - CF_T48_${IP48}_${PT48}
+    - CF_T49_${IP49}_${PT49}
+    - CF_T50_${IP50}_${PT50}
 
 - name: 🌍选择代理
   type: select
@@ -3991,31 +3200,31 @@ proxy-groups:
     - 负载均衡
     - 自动选择
     - DIRECT
-  	- CF_V26_${IP26}_${PT26}
-    - CF_V27_${IP27}_${PT27}
-    - CF_V28_${IP28}_${PT28}
-    - CF_V29_${IP29}_${PT29}
-    - CF_V30_${IP30}_${PT30}
-    - CF_V31_${IP31}_${PT31}
-    - CF_V32_${IP32}_${PT32}
-    - CF_V33_${IP33}_${PT33}
-    - CF_V34_${IP34}_${PT34}
-    - CF_V35_${IP35}_${PT35}
-    - CF_V36_${IP36}_${PT36}
-    - CF_V37_${IP37}_${PT37}
-    - CF_V38_${IP38}_${PT38}
-    - CF_V39_${IP39}_${PT39}
-    - CF_V40_${IP40}_${PT40}
-    - CF_V41_${IP41}_${PT41}
-    - CF_V42_${IP42}_${PT42}
-    - CF_V43_${IP43}_${PT43}
-    - CF_V44_${IP44}_${PT44}
-    - CF_V45_${IP45}_${PT45}
-    - CF_V46_${IP46}_${PT46}
-    - CF_V47_${IP47}_${PT47}
-    - CF_V48_${IP48}_${PT48}
-    - CF_V49_${IP49}_${PT49}
-    - CF_V50_${IP50}_${PT50}
+    - CF_T26_${IP26}_${PT26}
+    - CF_T27_${IP27}_${PT27}
+    - CF_T28_${IP28}_${PT28}
+    - CF_T29_${IP29}_${PT29}
+    - CF_T30_${IP30}_${PT30}
+    - CF_T31_${IP31}_${PT31}
+    - CF_T32_${IP32}_${PT32}
+    - CF_T33_${IP33}_${PT33}
+    - CF_T34_${IP34}_${PT34}
+    - CF_T35_${IP35}_${PT35}
+    - CF_T36_${IP36}_${PT36}
+    - CF_T37_${IP37}_${PT37}
+    - CF_T38_${IP38}_${PT38}
+    - CF_T39_${IP39}_${PT39}
+    - CF_T40_${IP40}_${PT40}
+    - CF_T41_${IP41}_${PT41}
+    - CF_T42_${IP42}_${PT42}
+    - CF_T43_${IP43}_${PT43}
+    - CF_T44_${IP44}_${PT44}
+    - CF_T45_${IP45}_${PT45}
+    - CF_T46_${IP46}_${PT46}
+    - CF_T47_${IP47}_${PT47}
+    - CF_T48_${IP48}_${PT48}
+    - CF_T49_${IP49}_${PT49}
+    - CF_T50_${IP50}_${PT50}
 
 rules:
   - GEOIP,LAN,DIRECT
@@ -4023,7 +3232,7 @@ rules:
   - MATCH,🌍选择代理`
 }
 		
-function getpsbConfig(userID, hostName) {
+function getpsbConfig(Pswd, hostName) {
 return `{
 		  "log": {
 			"disabled": false,
@@ -4117,723 +3326,698 @@ return `{
 			}
 		  ],
 		  "outbounds": [
-			{
-			  "tag": "select",
-			  "type": "selector",
-			  "default": "auto",
-			  "outbounds": [
-				"auto",
-                "CF_V26_${IP26}_${PT26}",
-                "CF_V27_${IP27}_${PT27}",
-                "CF_V28_${IP28}_${PT28}",
-                "CF_V29_${IP29}_${PT29}",
-                "CF_V30_${IP30}_${PT30}",
-                "CF_V31_${IP31}_${PT31}",
-                "CF_V32_${IP32}_${PT32}",
-                "CF_V33_${IP33}_${PT33}",
-                "CF_V34_${IP34}_${PT34}",
-                "CF_V35_${IP35}_${PT35}",
-                "CF_V36_${IP36}_${PT36}",
-                "CF_V37_${IP37}_${PT37}",
-                "CF_V38_${IP38}_${PT38}",
-                "CF_V39_${IP39}_${PT39}",
-                "CF_V40_${IP40}_${PT40}",
-                "CF_V41_${IP41}_${PT41}",
-                "CF_V42_${IP42}_${PT42}",
-                "CF_V43_${IP43}_${PT43}",
-                "CF_V44_${IP44}_${PT44}",
-                "CF_V45_${IP45}_${PT45}",
-                "CF_V46_${IP46}_${PT46}",
-                "CF_V47_${IP47}_${PT47}",
-                "CF_V48_${IP48}_${PT48}",
-                "CF_V49_${IP49}_${PT49}",
-                "CF_V50_${IP50}_${PT50}"
-			  ]
-			},
-			{
-			  "server": "${IP26}",
-			  "server_port": ${PT26},
-			  "tag": "CF_V26_${IP26}_${PT26}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-			{
-			  "server": "${IP27}",
-			  "server_port": ${PT27},
-			  "tag": "CF_V27_${IP27}_${PT27}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-			{
-			  "server": "${IP28}",
-			  "server_port": ${PT28},
-			  "tag": "CF_V28_${IP28}_${PT28}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-			{
-			  "server": "${IP29}",
-			  "server_port": ${PT29},
-			  "tag": "CF_V29_${IP29}_${PT29}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-			{
-			  "server": "${IP30}",
-			  "server_port": ${PT30},
-			  "tag": "CF_V30_${IP30}_${PT30}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-			{
-			  "server": "${IP31}",
-			  "server_port": ${PT31},
-			  "tag": "CF_V31_${IP31}_${PT31}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP32}",
-			  "server_port": ${PT32},
-			  "tag": "CF_V32_${IP32}_${PT32}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP33}",
-			  "server_port": ${PT33},
-			  "tag": "CF_V33_${IP33}_${PT33}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP34}",
-			  "server_port": ${PT34},
-			  "tag": "CF_V34_${IP34}_${PT34}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP35}",
-			  "server_port": ${PT35},
-			  "tag": "CF_V35_${IP35}_${PT35}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP36}",
-			  "server_port": ${PT36},
-			  "tag": "CF_V36_${IP36}_${PT36}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP37}",
-			  "server_port": ${PT37},
-			  "tag": "CF_V37_${IP37}_${PT37}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP38}",
-			  "server_port": ${PT38},
-			  "tag": "CF_V38_${IP38}_${PT38}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP39}",
-			  "server_port": ${PT39},
-			  "tag": "CF_V39_${IP39}_${PT39}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP40}",
-			  "server_port": ${PT40},
-			  "tag": "CF_V40_${IP40}_${PT40}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP41}",
-			  "server_port": ${PT41},
-			  "tag": "CF_V41_${IP41}_${PT41}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP42}",
-			  "server_port": ${PT42},
-			  "tag": "CF_V42_${IP42}_${PT42}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP43}",
-			  "server_port": ${PT43},
-			  "tag": "CF_V43_${IP43}_${PT43}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP44}",
-			  "server_port": ${PT44},
-			  "tag": "CF_V44_${IP44}_${PT44}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP45}",
-			  "server_port": ${PT45},
-			  "tag": "CF_V45_${IP45}_${PT45}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP46}",
-			  "server_port": ${PT46},
-			  "tag": "CF_V46_${IP46}_${PT46}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP47}",
-			  "server_port": ${PT47},
-			  "tag": "CF_V47_${IP47}_${PT47}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP48}",
-			  "server_port": ${PT48},
-			  "tag": "CF_V48_${IP48}_${PT48}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP49}",
-			  "server_port": ${PT49},
-			  "tag": "CF_V49_${IP49}_${PT49}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-						{
-			  "server": "${IP50}",
-			  "server_port": ${PT50},
-			  "tag": "CF_V50_${IP50}_${PT50}",
-			  "tls": {
-				"enabled": true,
-				"server_name": "${hostName}",
-				"insecure": false,
-				"utls": {
-				  "enabled": true,
-				  "fingerprint": "chrome"
-				}
-			  },
-			  "packet_encoding": "packetaddr",
-			  "transport": {
-				"headers": {
-				  "Host": [
-					"${hostName}"
-				  ]
-				},
-				"path": "/?ed=2560",
-				"type": "ws"
-			  },
-			  "type": "vless",
-			  "uuid": "${userID}"
-			},
-			{
-			  "tag": "direct",
-			  "type": "direct"
-			},
-			{
-			  "tag": "auto",
-			  "type": "urltest",
-			  "outbounds": [
-                "CF_V26_${IP26}_${PT26}",
-                "CF_V27_${IP27}_${PT27}",
-                "CF_V28_${IP28}_${PT28}",
-                "CF_V29_${IP29}_${PT29}",
-                "CF_V30_${IP30}_${PT30}",
-                "CF_V31_${IP31}_${PT31}",
-                "CF_V32_${IP32}_${PT32}",
-                "CF_V33_${IP33}_${PT33}",
-                "CF_V34_${IP34}_${PT34}",
-                "CF_V35_${IP35}_${PT35}",
-                "CF_V36_${IP36}_${PT36}",
-                "CF_V37_${IP37}_${PT37}",
-                "CF_V38_${IP38}_${PT38}",
-                "CF_V39_${IP39}_${PT39}",
-                "CF_V40_${IP40}_${PT40}",
-                "CF_V41_${IP41}_${PT41}",
-                "CF_V42_${IP42}_${PT42}",
-                "CF_V43_${IP43}_${PT43}",
-                "CF_V44_${IP44}_${PT44}",
-                "CF_V45_${IP45}_${PT45}",
-                "CF_V46_${IP46}_${PT46}",
-                "CF_V47_${IP47}_${PT47}",
-                "CF_V48_${IP48}_${PT48}",
-                "CF_V49_${IP49}_${PT49}",
-                "CF_V50_${IP50}_${PT50}"
-			  ],
+        {
+          "tag": "select",
+          "type": "selector",
+          "default": "auto",
+          "outbounds": [
+          "auto",
+        "CF_T26_${IP26}_${PT26}",
+        "CF_T27_${IP27}_${PT27}",
+        "CF_T28_${IP28}_${PT28}",
+        "CF_T29_${IP29}_${PT29}",
+        "CF_T30_${IP30}_${PT30}",
+        "CF_T31_${IP31}_${PT31}",
+        "CF_T32_${IP32}_${PT32}",
+        "CF_T33_${IP33}_${PT33}",
+        "CF_T34_${IP34}_${PT34}",
+        "CF_T35_${IP35}_${PT35}",
+        "CF_T36_${IP36}_${PT36}",
+        "CF_T37_${IP37}_${PT37}",
+        "CF_T38_${IP38}_${PT38}",
+        "CF_T39_${IP39}_${PT39}",
+        "CF_T40_${IP40}_${PT40}",
+        "CF_T41_${IP41}_${PT41}",
+        "CF_T42_${IP42}_${PT42}",
+        "CF_T43_${IP43}_${PT43}",
+        "CF_T44_${IP44}_${PT44}",
+        "CF_T45_${IP45}_${PT45}",
+        "CF_T46_${IP46}_${PT46}",
+        "CF_T47_${IP47}_${PT47}",
+        "CF_T48_${IP48}_${PT48}",
+        "CF_T49_${IP49}_${PT49}",
+        "CF_T50_${IP50}_${PT50}"
+          ]
+        },
+        {
+  "server": "${IP26}",
+  "server_port": ${PT26},
+  "tag": "CF_T26_${IP26}_${PT26}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP27}",
+  "server_port": ${PT27},
+  "tag": "CF_T27_${IP27}_${PT27}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP28}",
+  "server_port": ${PT28},
+  "tag": "CF_T28_${IP28}_${PT28}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP29}",
+  "server_port": ${PT29},
+  "tag": "CF_T29_${IP29}_${PT29}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP30}",
+  "server_port": ${PT30},
+  "tag": "CF_T30_${IP30}_${PT30}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP31}",
+  "server_port": ${PT31},
+  "tag": "CF_T31_${IP31}_${PT31}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP32}",
+  "server_port": ${PT32},
+  "tag": "CF_T32_${IP32}_${PT32}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP33}",
+  "server_port": ${PT33},
+  "tag": "CF_T33_${IP33}_${PT33}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP34}",
+  "server_port": ${PT34},
+  "tag": "CF_T34_${IP34}_${PT34}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP35}",
+  "server_port": ${PT35},
+  "tag": "CF_T35_${IP35}_${PT35}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP36}",
+  "server_port": ${PT36},
+  "tag": "CF_T36_${IP36}_${PT36}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP37}",
+  "server_port": ${PT37},
+  "tag": "CF_T37_${IP37}_${PT37}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP38}",
+  "server_port": ${PT38},
+  "tag": "CF_T38_${IP38}_${PT38}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP39}",
+  "server_port": ${PT39},
+  "tag": "CF_T39_${IP39}_${PT39}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP40}",
+  "server_port": ${PT40},
+  "tag": "CF_T40_${IP40}_${PT40}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP41}",
+  "server_port": ${PT41},
+  "tag": "CF_T41_${IP41}_${PT41}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP42}",
+  "server_port": ${PT42},
+  "tag": "CF_T42_${IP42}_${PT42}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP43}",
+  "server_port": ${PT43},
+  "tag": "CF_T43_${IP43}_${PT43}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP44}",
+  "server_port": ${PT44},
+  "tag": "CF_T44_${IP44}_${PT44}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP45}",
+  "server_port": ${PT45},
+  "tag": "CF_T45_${IP45}_${PT45}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP46}",
+  "server_port": ${PT46},
+  "tag": "CF_T46_${IP46}_${PT46}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP47}",
+  "server_port": ${PT47},
+  "tag": "CF_T47_${IP47}_${PT47}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP48}",
+  "server_port": ${PT48},
+  "tag": "CF_T48_${IP48}_${PT48}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP49}",
+  "server_port": ${PT49},
+  "tag": "CF_T49_${IP49}_${PT49}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+},
+{
+  "server": "${IP50}",
+  "server_port": ${PT50},
+  "tag": "CF_T50_${IP50}_${PT50}",
+  "tls": {
+    "enabled": true,
+    "server_name": "${hostName}",
+    "insecure": false,
+    "utls": {
+      "enabled": true,
+      "fingerprint": "chrome"
+    }
+  },
+  "transport": {
+    "headers": {
+      "Host": [
+        "${hostName}"
+      ]
+    },
+    "path": "/?ed=2560",
+    "type": "ws"
+  },
+  "type": "trojan",
+  "password": "${Pswd}"
+        },
+        {
+          "tag": "direct",
+          "type": "direct"
+        },
+        {
+          "tag": "auto",
+          "type": "urltest",
+          "outbounds": [
+        "CF_T26_${IP26}_${PT26}",
+        "CF_T27_${IP27}_${PT27}",
+        "CF_T28_${IP28}_${PT28}",
+        "CF_T29_${IP29}_${PT29}",
+        "CF_T30_${IP30}_${PT30}",
+        "CF_T31_${IP31}_${PT31}",
+        "CF_T32_${IP32}_${PT32}",
+        "CF_T33_${IP33}_${PT33}",
+        "CF_T34_${IP34}_${PT34}",
+        "CF_T35_${IP35}_${PT35}",
+        "CF_T36_${IP36}_${PT36}",
+        "CF_T37_${IP37}_${PT37}",
+        "CF_T38_${IP38}_${PT38}",
+        "CF_T39_${IP39}_${PT39}",
+        "CF_T40_${IP40}_${PT40}",
+        "CF_T41_${IP41}_${PT41}",
+        "CF_T42_${IP42}_${PT42}",
+        "CF_T43_${IP43}_${PT43}",
+        "CF_T44_${IP44}_${PT44}",
+        "CF_T45_${IP45}_${PT45}",
+        "CF_T46_${IP46}_${PT46}",
+        "CF_T47_${IP47}_${PT47}",
+        "CF_T48_${IP48}_${PT48}",
+        "CF_T49_${IP49}_${PT49}",
+        "CF_T50_${IP50}_${PT50}"
+          ],
 			  "url": "https://www.gstatic.com/generate_204",
 			  "interval": "1m",
 			  "tolerance": 50,
@@ -4870,19 +4054,19 @@ return `{
 			"auto_detect_interface": true,
 			"final": "select",
 			"rules": [
-                          {
-                         "inbound": "tun-in",
-                          "action": "sniff"
-                          },
-                          {
-                          "protocol": "dns",
-                          "action": "hijack-dns"
-                           },
-                          {
-                           "port": 443,
-                          "network": "udp",
-                          "action": "reject"
-                          },
+                            {
+                           "inbound": "tun-in",
+                           "action": "sniff"
+                             },
+                             {
+                             "protocol": "dns",
+                             "action": "hijack-dns"
+                               },
+                              {
+                            "port": 443,
+                            "network": "udp",
+                            "action": "reject"
+                            },
 			  {
 				"clash_mode": "Direct",
 				"outbound": "direct"
@@ -4917,4 +4101,668 @@ return `{
 			"detour": "direct"
 		  }
 		}`;
-} 
+}
+
+/**
+ * [js-sha256]{@link https://github.com/emn178/js-sha256}
+ *
+ * @version 0.11.0
+ * @author Chen, Yi-Cyuan [emn178@gmail.com]
+ * @copyright Chen, Yi-Cyuan 2014-2024
+ * @license MIT
+ */
+/*jslint bitwise: true */
+(function () {
+  "use strict";
+
+  var ERROR = "input is invalid type";
+  var WINDOW = typeof window === "object";
+  var root = WINDOW ? window : {};
+  if (root.JS_SHA256_NO_WINDOW) {
+    WINDOW = false;
+  }
+  var WEB_WORKER = !WINDOW && typeof self === "object";
+  var NODE_JS = !root.JS_SHA256_NO_NODE_JS && typeof process === "object" && process.versions && process.versions.node;
+  if (NODE_JS) {
+    root = global;
+  } else if (WEB_WORKER) {
+    root = self;
+  }
+  var COMMON_JS = !root.JS_SHA256_NO_COMMON_JS && typeof module === "object" && module.exports;
+  var AMD = typeof define === "function" && define.amd;
+  var ARRAY_BUFFER = !root.JS_SHA256_NO_ARRAY_BUFFER && typeof ArrayBuffer !== "undefined";
+  var HEX_CHARS = "0123456789abcdef".split("");
+  var EXTRA = [-2147483648, 8388608, 32768, 128];
+  var SHIFT = [24, 16, 8, 0];
+  var K = [
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98,
+    0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786,
+    0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8,
+    0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13,
+    0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819,
+    0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a,
+    0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7,
+    0xc67178f2,
+  ];
+  var OUTPUT_TYPES = ["hex", "array", "digest", "arrayBuffer"];
+
+  var blocks = [];
+
+  if (root.JS_SHA256_NO_NODE_JS || !Array.isArray) {
+    Array.isArray = function (obj) {
+      return Object.prototype.toString.call(obj) === "[object Array]";
+    };
+  }
+
+  if (ARRAY_BUFFER && (root.JS_SHA256_NO_ARRAY_BUFFER_IS_VIEW || !ArrayBuffer.isView)) {
+    ArrayBuffer.isView = function (obj) {
+      return typeof obj === "object" && obj.buffer && obj.buffer.constructor === ArrayBuffer;
+    };
+  }
+
+  var createOutputMethod = function (outputType, is224) {
+    return function (message) {
+      return new Sha256(is224, true).update(message)[outputType]();
+    };
+  };
+
+  var createMethod = function (is224) {
+    var method = createOutputMethod("hex", is224);
+    if (NODE_JS) {
+      method = nodeWrap(method, is224);
+    }
+    method.create = function () {
+      return new Sha256(is224);
+    };
+    method.update = function (message) {
+      return method.create().update(message);
+    };
+    for (var i = 0; i < OUTPUT_TYPES.length; ++i) {
+      var type = OUTPUT_TYPES[i];
+      method[type] = createOutputMethod(type, is224);
+    }
+    return method;
+  };
+
+  var nodeWrap = function (method, is224) {
+    var crypto = require("crypto");
+    var Buffer = require("buffer").Buffer;
+    var algorithm = is224 ? "sha224" : "sha256";
+    var bufferFrom;
+    if (Buffer.from && !root.JS_SHA256_NO_BUFFER_FROM) {
+      bufferFrom = Buffer.from;
+    } else {
+      bufferFrom = function (message) {
+        return new Buffer(message);
+      };
+    }
+    var nodeMethod = function (message) {
+      if (typeof message === "string") {
+        return crypto.createHash(algorithm).update(message, "utf8").digest("hex");
+      } else {
+        if (message === null || message === undefined) {
+          throw new Error(ERROR);
+        } else if (message.constructor === ArrayBuffer) {
+          message = new Uint8Array(message);
+        }
+      }
+      if (Array.isArray(message) || ArrayBuffer.isView(message) || message.constructor === Buffer) {
+        return crypto.createHash(algorithm).update(bufferFrom(message)).digest("hex");
+      } else {
+        return method(message);
+      }
+    };
+    return nodeMethod;
+  };
+
+  var createHmacOutputMethod = function (outputType, is224) {
+    return function (key, message) {
+      return new HmacSha256(key, is224, true).update(message)[outputType]();
+    };
+  };
+
+  var createHmacMethod = function (is224) {
+    var method = createHmacOutputMethod("hex", is224);
+    method.create = function (key) {
+      return new HmacSha256(key, is224);
+    };
+    method.update = function (key, message) {
+      return method.create(key).update(message);
+    };
+    for (var i = 0; i < OUTPUT_TYPES.length; ++i) {
+      var type = OUTPUT_TYPES[i];
+      method[type] = createHmacOutputMethod(type, is224);
+    }
+    return method;
+  };
+
+  function Sha256(is224, sharedMemory) {
+    if (sharedMemory) {
+      blocks[0] =
+        blocks[16] =
+        blocks[1] =
+        blocks[2] =
+        blocks[3] =
+        blocks[4] =
+        blocks[5] =
+        blocks[6] =
+        blocks[7] =
+        blocks[8] =
+        blocks[9] =
+        blocks[10] =
+        blocks[11] =
+        blocks[12] =
+        blocks[13] =
+        blocks[14] =
+        blocks[15] =
+          0;
+      this.blocks = blocks;
+    } else {
+      this.blocks = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    }
+
+    if (is224) {
+      this.h0 = 0xc1059ed8;
+      this.h1 = 0x367cd507;
+      this.h2 = 0x3070dd17;
+      this.h3 = 0xf70e5939;
+      this.h4 = 0xffc00b31;
+      this.h5 = 0x68581511;
+      this.h6 = 0x64f98fa7;
+      this.h7 = 0xbefa4fa4;
+    } else {
+      // 256
+      this.h0 = 0x6a09e667;
+      this.h1 = 0xbb67ae85;
+      this.h2 = 0x3c6ef372;
+      this.h3 = 0xa54ff53a;
+      this.h4 = 0x510e527f;
+      this.h5 = 0x9b05688c;
+      this.h6 = 0x1f83d9ab;
+      this.h7 = 0x5be0cd19;
+    }
+
+    this.block = this.start = this.bytes = this.hBytes = 0;
+    this.finalized = this.hashed = false;
+    this.first = true;
+    this.is224 = is224;
+  }
+
+  Sha256.prototype.update = function (message) {
+    if (this.finalized) {
+      return;
+    }
+    var notString,
+      type = typeof message;
+    if (type !== "string") {
+      if (type === "object") {
+        if (message === null) {
+          throw new Error(ERROR);
+        } else if (ARRAY_BUFFER && message.constructor === ArrayBuffer) {
+          message = new Uint8Array(message);
+        } else if (!Array.isArray(message)) {
+          if (!ARRAY_BUFFER || !ArrayBuffer.isView(message)) {
+            throw new Error(ERROR);
+          }
+        }
+      } else {
+        throw new Error(ERROR);
+      }
+      notString = true;
+    }
+    var code,
+      index = 0,
+      i,
+      length = message.length,
+      blocks = this.blocks;
+    while (index < length) {
+      if (this.hashed) {
+        this.hashed = false;
+        blocks[0] = this.block;
+        this.block =
+          blocks[16] =
+          blocks[1] =
+          blocks[2] =
+          blocks[3] =
+          blocks[4] =
+          blocks[5] =
+          blocks[6] =
+          blocks[7] =
+          blocks[8] =
+          blocks[9] =
+          blocks[10] =
+          blocks[11] =
+          blocks[12] =
+          blocks[13] =
+          blocks[14] =
+          blocks[15] =
+            0;
+      }
+
+      if (notString) {
+        for (i = this.start; index < length && i < 64; ++index) {
+          blocks[i >>> 2] |= message[index] << SHIFT[i++ & 3];
+        }
+      } else {
+        for (i = this.start; index < length && i < 64; ++index) {
+          code = message.charCodeAt(index);
+          if (code < 0x80) {
+            blocks[i >>> 2] |= code << SHIFT[i++ & 3];
+          } else if (code < 0x800) {
+            blocks[i >>> 2] |= (0xc0 | (code >>> 6)) << SHIFT[i++ & 3];
+            blocks[i >>> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+          } else if (code < 0xd800 || code >= 0xe000) {
+            blocks[i >>> 2] |= (0xe0 | (code >>> 12)) << SHIFT[i++ & 3];
+            blocks[i >>> 2] |= (0x80 | ((code >>> 6) & 0x3f)) << SHIFT[i++ & 3];
+            blocks[i >>> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+          } else {
+            code = 0x10000 + (((code & 0x3ff) << 10) | (message.charCodeAt(++index) & 0x3ff));
+            blocks[i >>> 2] |= (0xf0 | (code >>> 18)) << SHIFT[i++ & 3];
+            blocks[i >>> 2] |= (0x80 | ((code >>> 12) & 0x3f)) << SHIFT[i++ & 3];
+            blocks[i >>> 2] |= (0x80 | ((code >>> 6) & 0x3f)) << SHIFT[i++ & 3];
+            blocks[i >>> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+          }
+        }
+      }
+
+      this.lastByteIndex = i;
+      this.bytes += i - this.start;
+      if (i >= 64) {
+        this.block = blocks[16];
+        this.start = i - 64;
+        this.hash();
+        this.hashed = true;
+      } else {
+        this.start = i;
+      }
+    }
+    if (this.bytes > 4294967295) {
+      this.hBytes += (this.bytes / 4294967296) << 0;
+      this.bytes = this.bytes % 4294967296;
+    }
+    return this;
+  };
+
+  Sha256.prototype.finalize = function () {
+    if (this.finalized) {
+      return;
+    }
+    this.finalized = true;
+    var blocks = this.blocks,
+      i = this.lastByteIndex;
+    blocks[16] = this.block;
+    blocks[i >>> 2] |= EXTRA[i & 3];
+    this.block = blocks[16];
+    if (i >= 56) {
+      if (!this.hashed) {
+        this.hash();
+      }
+      blocks[0] = this.block;
+      blocks[16] =
+        blocks[1] =
+        blocks[2] =
+        blocks[3] =
+        blocks[4] =
+        blocks[5] =
+        blocks[6] =
+        blocks[7] =
+        blocks[8] =
+        blocks[9] =
+        blocks[10] =
+        blocks[11] =
+        blocks[12] =
+        blocks[13] =
+        blocks[14] =
+        blocks[15] =
+          0;
+    }
+    blocks[14] = (this.hBytes << 3) | (this.bytes >>> 29);
+    blocks[15] = this.bytes << 3;
+    this.hash();
+  };
+
+  Sha256.prototype.hash = function () {
+    var a = this.h0,
+      b = this.h1,
+      c = this.h2,
+      d = this.h3,
+      e = this.h4,
+      f = this.h5,
+      g = this.h6,
+      h = this.h7,
+      blocks = this.blocks,
+      j,
+      s0,
+      s1,
+      maj,
+      t1,
+      t2,
+      ch,
+      ab,
+      da,
+      cd,
+      bc;
+
+    for (j = 16; j < 64; ++j) {
+      // rightrotate
+      t1 = blocks[j - 15];
+      s0 = ((t1 >>> 7) | (t1 << 25)) ^ ((t1 >>> 18) | (t1 << 14)) ^ (t1 >>> 3);
+      t1 = blocks[j - 2];
+      s1 = ((t1 >>> 17) | (t1 << 15)) ^ ((t1 >>> 19) | (t1 << 13)) ^ (t1 >>> 10);
+      blocks[j] = (blocks[j - 16] + s0 + blocks[j - 7] + s1) << 0;
+    }
+
+    bc = b & c;
+    for (j = 0; j < 64; j += 4) {
+      if (this.first) {
+        if (this.is224) {
+          ab = 300032;
+          t1 = blocks[0] - 1413257819;
+          h = (t1 - 150054599) << 0;
+          d = (t1 + 24177077) << 0;
+        } else {
+          ab = 704751109;
+          t1 = blocks[0] - 210244248;
+          h = (t1 - 1521486534) << 0;
+          d = (t1 + 143694565) << 0;
+        }
+        this.first = false;
+      } else {
+        s0 = ((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10));
+        s1 = ((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7));
+        ab = a & b;
+        maj = ab ^ (a & c) ^ bc;
+        ch = (e & f) ^ (~e & g);
+        t1 = h + s1 + ch + K[j] + blocks[j];
+        t2 = s0 + maj;
+        h = (d + t1) << 0;
+        d = (t1 + t2) << 0;
+      }
+      s0 = ((d >>> 2) | (d << 30)) ^ ((d >>> 13) | (d << 19)) ^ ((d >>> 22) | (d << 10));
+      s1 = ((h >>> 6) | (h << 26)) ^ ((h >>> 11) | (h << 21)) ^ ((h >>> 25) | (h << 7));
+      da = d & a;
+      maj = da ^ (d & b) ^ ab;
+      ch = (h & e) ^ (~h & f);
+      t1 = g + s1 + ch + K[j + 1] + blocks[j + 1];
+      t2 = s0 + maj;
+      g = (c + t1) << 0;
+      c = (t1 + t2) << 0;
+      s0 = ((c >>> 2) | (c << 30)) ^ ((c >>> 13) | (c << 19)) ^ ((c >>> 22) | (c << 10));
+      s1 = ((g >>> 6) | (g << 26)) ^ ((g >>> 11) | (g << 21)) ^ ((g >>> 25) | (g << 7));
+      cd = c & d;
+      maj = cd ^ (c & a) ^ da;
+      ch = (g & h) ^ (~g & e);
+      t1 = f + s1 + ch + K[j + 2] + blocks[j + 2];
+      t2 = s0 + maj;
+      f = (b + t1) << 0;
+      b = (t1 + t2) << 0;
+      s0 = ((b >>> 2) | (b << 30)) ^ ((b >>> 13) | (b << 19)) ^ ((b >>> 22) | (b << 10));
+      s1 = ((f >>> 6) | (f << 26)) ^ ((f >>> 11) | (f << 21)) ^ ((f >>> 25) | (f << 7));
+      bc = b & c;
+      maj = bc ^ (b & d) ^ cd;
+      ch = (f & g) ^ (~f & h);
+      t1 = e + s1 + ch + K[j + 3] + blocks[j + 3];
+      t2 = s0 + maj;
+      e = (a + t1) << 0;
+      a = (t1 + t2) << 0;
+      this.chromeBugWorkAround = true;
+    }
+
+    this.h0 = (this.h0 + a) << 0;
+    this.h1 = (this.h1 + b) << 0;
+    this.h2 = (this.h2 + c) << 0;
+    this.h3 = (this.h3 + d) << 0;
+    this.h4 = (this.h4 + e) << 0;
+    this.h5 = (this.h5 + f) << 0;
+    this.h6 = (this.h6 + g) << 0;
+    this.h7 = (this.h7 + h) << 0;
+  };
+
+  Sha256.prototype.hex = function () {
+    this.finalize();
+
+    var h0 = this.h0,
+      h1 = this.h1,
+      h2 = this.h2,
+      h3 = this.h3,
+      h4 = this.h4,
+      h5 = this.h5,
+      h6 = this.h6,
+      h7 = this.h7;
+
+    var hex =
+      HEX_CHARS[(h0 >>> 28) & 0x0f] +
+      HEX_CHARS[(h0 >>> 24) & 0x0f] +
+      HEX_CHARS[(h0 >>> 20) & 0x0f] +
+      HEX_CHARS[(h0 >>> 16) & 0x0f] +
+      HEX_CHARS[(h0 >>> 12) & 0x0f] +
+      HEX_CHARS[(h0 >>> 8) & 0x0f] +
+      HEX_CHARS[(h0 >>> 4) & 0x0f] +
+      HEX_CHARS[h0 & 0x0f] +
+      HEX_CHARS[(h1 >>> 28) & 0x0f] +
+      HEX_CHARS[(h1 >>> 24) & 0x0f] +
+      HEX_CHARS[(h1 >>> 20) & 0x0f] +
+      HEX_CHARS[(h1 >>> 16) & 0x0f] +
+      HEX_CHARS[(h1 >>> 12) & 0x0f] +
+      HEX_CHARS[(h1 >>> 8) & 0x0f] +
+      HEX_CHARS[(h1 >>> 4) & 0x0f] +
+      HEX_CHARS[h1 & 0x0f] +
+      HEX_CHARS[(h2 >>> 28) & 0x0f] +
+      HEX_CHARS[(h2 >>> 24) & 0x0f] +
+      HEX_CHARS[(h2 >>> 20) & 0x0f] +
+      HEX_CHARS[(h2 >>> 16) & 0x0f] +
+      HEX_CHARS[(h2 >>> 12) & 0x0f] +
+      HEX_CHARS[(h2 >>> 8) & 0x0f] +
+      HEX_CHARS[(h2 >>> 4) & 0x0f] +
+      HEX_CHARS[h2 & 0x0f] +
+      HEX_CHARS[(h3 >>> 28) & 0x0f] +
+      HEX_CHARS[(h3 >>> 24) & 0x0f] +
+      HEX_CHARS[(h3 >>> 20) & 0x0f] +
+      HEX_CHARS[(h3 >>> 16) & 0x0f] +
+      HEX_CHARS[(h3 >>> 12) & 0x0f] +
+      HEX_CHARS[(h3 >>> 8) & 0x0f] +
+      HEX_CHARS[(h3 >>> 4) & 0x0f] +
+      HEX_CHARS[h3 & 0x0f] +
+      HEX_CHARS[(h4 >>> 28) & 0x0f] +
+      HEX_CHARS[(h4 >>> 24) & 0x0f] +
+      HEX_CHARS[(h4 >>> 20) & 0x0f] +
+      HEX_CHARS[(h4 >>> 16) & 0x0f] +
+      HEX_CHARS[(h4 >>> 12) & 0x0f] +
+      HEX_CHARS[(h4 >>> 8) & 0x0f] +
+      HEX_CHARS[(h4 >>> 4) & 0x0f] +
+      HEX_CHARS[h4 & 0x0f] +
+      HEX_CHARS[(h5 >>> 28) & 0x0f] +
+      HEX_CHARS[(h5 >>> 24) & 0x0f] +
+      HEX_CHARS[(h5 >>> 20) & 0x0f] +
+      HEX_CHARS[(h5 >>> 16) & 0x0f] +
+      HEX_CHARS[(h5 >>> 12) & 0x0f] +
+      HEX_CHARS[(h5 >>> 8) & 0x0f] +
+      HEX_CHARS[(h5 >>> 4) & 0x0f] +
+      HEX_CHARS[h5 & 0x0f] +
+      HEX_CHARS[(h6 >>> 28) & 0x0f] +
+      HEX_CHARS[(h6 >>> 24) & 0x0f] +
+      HEX_CHARS[(h6 >>> 20) & 0x0f] +
+      HEX_CHARS[(h6 >>> 16) & 0x0f] +
+      HEX_CHARS[(h6 >>> 12) & 0x0f] +
+      HEX_CHARS[(h6 >>> 8) & 0x0f] +
+      HEX_CHARS[(h6 >>> 4) & 0x0f] +
+      HEX_CHARS[h6 & 0x0f];
+    if (!this.is224) {
+      hex +=
+        HEX_CHARS[(h7 >>> 28) & 0x0f] +
+        HEX_CHARS[(h7 >>> 24) & 0x0f] +
+        HEX_CHARS[(h7 >>> 20) & 0x0f] +
+        HEX_CHARS[(h7 >>> 16) & 0x0f] +
+        HEX_CHARS[(h7 >>> 12) & 0x0f] +
+        HEX_CHARS[(h7 >>> 8) & 0x0f] +
+        HEX_CHARS[(h7 >>> 4) & 0x0f] +
+        HEX_CHARS[h7 & 0x0f];
+    }
+    return hex;
+  };
+
+  Sha256.prototype.toString = Sha256.prototype.hex;
+
+  Sha256.prototype.digest = function () {
+    this.finalize();
+
+    var h0 = this.h0,
+      h1 = this.h1,
+      h2 = this.h2,
+      h3 = this.h3,
+      h4 = this.h4,
+      h5 = this.h5,
+      h6 = this.h6,
+      h7 = this.h7;
+
+    var arr = [
+      (h0 >>> 24) & 0xff,
+      (h0 >>> 16) & 0xff,
+      (h0 >>> 8) & 0xff,
+      h0 & 0xff,
+      (h1 >>> 24) & 0xff,
+      (h1 >>> 16) & 0xff,
+      (h1 >>> 8) & 0xff,
+      h1 & 0xff,
+      (h2 >>> 24) & 0xff,
+      (h2 >>> 16) & 0xff,
+      (h2 >>> 8) & 0xff,
+      h2 & 0xff,
+      (h3 >>> 24) & 0xff,
+      (h3 >>> 16) & 0xff,
+      (h3 >>> 8) & 0xff,
+      h3 & 0xff,
+      (h4 >>> 24) & 0xff,
+      (h4 >>> 16) & 0xff,
+      (h4 >>> 8) & 0xff,
+      h4 & 0xff,
+      (h5 >>> 24) & 0xff,
+      (h5 >>> 16) & 0xff,
+      (h5 >>> 8) & 0xff,
+      h5 & 0xff,
+      (h6 >>> 24) & 0xff,
+      (h6 >>> 16) & 0xff,
+      (h6 >>> 8) & 0xff,
+      h6 & 0xff,
+    ];
+    if (!this.is224) {
+      arr.push((h7 >>> 24) & 0xff, (h7 >>> 16) & 0xff, (h7 >>> 8) & 0xff, h7 & 0xff);
+    }
+    return arr;
+  };
+
+  Sha256.prototype.array = Sha256.prototype.digest;
+
+  Sha256.prototype.arrayBuffer = function () {
+    this.finalize();
+
+    var buffer = new ArrayBuffer(this.is224 ? 28 : 32);
+    var dataView = new DataView(buffer);
+    dataView.setUint32(0, this.h0);
+    dataView.setUint32(4, this.h1);
+    dataView.setUint32(8, this.h2);
+    dataView.setUint32(12, this.h3);
+    dataView.setUint32(16, this.h4);
+    dataView.setUint32(20, this.h5);
+    dataView.setUint32(24, this.h6);
+    if (!this.is224) {
+      dataView.setUint32(28, this.h7);
+    }
+    return buffer;
+  };
+
+  function HmacSha256(key, is224, sharedMemory) {
+    var i,
+      type = typeof key;
+    if (type === "string") {
+      var bytes = [],
+        length = key.length,
+        index = 0,
+        code;
+      for (i = 0; i < length; ++i) {
+        code = key.charCodeAt(i);
+        if (code < 0x80) {
+          bytes[index++] = code;
+        } else if (code < 0x800) {
+          bytes[index++] = 0xc0 | (code >>> 6);
+          bytes[index++] = 0x80 | (code & 0x3f);
+        } else if (code < 0xd800 || code >= 0xe000) {
+          bytes[index++] = 0xe0 | (code >>> 12);
+          bytes[index++] = 0x80 | ((code >>> 6) & 0x3f);
+          bytes[index++] = 0x80 | (code & 0x3f);
+        } else {
+          code = 0x10000 + (((code & 0x3ff) << 10) | (key.charCodeAt(++i) & 0x3ff));
+          bytes[index++] = 0xf0 | (code >>> 18);
+          bytes[index++] = 0x80 | ((code >>> 12) & 0x3f);
+          bytes[index++] = 0x80 | ((code >>> 6) & 0x3f);
+          bytes[index++] = 0x80 | (code & 0x3f);
+        }
+      }
+      key = bytes;
+    } else {
+      if (type === "object") {
+        if (key === null) {
+          throw new Error(ERROR);
+        } else if (ARRAY_BUFFER && key.constructor === ArrayBuffer) {
+          key = new Uint8Array(key);
+        } else if (!Array.isArray(key)) {
+          if (!ARRAY_BUFFER || !ArrayBuffer.isView(key)) {
+            throw new Error(ERROR);
+          }
+        }
+      } else {
+        throw new Error(ERROR);
+      }
+    }
+
+    if (key.length > 64) {
+      key = new Sha256(is224, true).update(key).array();
+    }
+
+    var oKeyPad = [],
+      iKeyPad = [];
+    for (i = 0; i < 64; ++i) {
+      var b = key[i] || 0;
+      oKeyPad[i] = 0x5c ^ b;
+      iKeyPad[i] = 0x36 ^ b;
+    }
+
+    Sha256.call(this, is224, sharedMemory);
+
+    this.update(iKeyPad);
+    this.oKeyPad = oKeyPad;
+    this.inner = true;
+    this.sharedMemory = sharedMemory;
+  }
+  HmacSha256.prototype = new Sha256();
+
+  HmacSha256.prototype.finalize = function () {
+    Sha256.prototype.finalize.call(this);
+    if (this.inner) {
+      this.inner = false;
+      var innerHash = this.array();
+      Sha256.call(this, this.is224, this.sharedMemory);
+      this.update(this.oKeyPad);
+      this.update(innerHash);
+      Sha256.prototype.finalize.call(this);
+    }
+  };
+
+  var exports = createMethod();
+  exports.sha256 = exports;
+  exports.sha224 = createMethod(true);
+  exports.sha256.hmac = createHmacMethod();
+  exports.sha224.hmac = createHmacMethod(true);
+
+  if (COMMON_JS) {
+    module.exports = exports;
+  } else {
+    root.sha256 = exports.sha256;
+    root.sha224 = exports.sha224;
+    if (AMD) {
+      define(function () {
+        return exports;
+      });
+    }
+  }
+})();
